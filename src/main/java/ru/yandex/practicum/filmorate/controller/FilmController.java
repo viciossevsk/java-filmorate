@@ -19,13 +19,13 @@ public class FilmController {
     private Map<Integer, Film> films = new HashMap<>();
     private int generatorId;
 
-    @GetMapping("/films")
+    @GetMapping()
     public List<Film> getAllFilms() {
         log.info("Вызываем метод getAllFilms... через GET /films");
         return new ArrayList<>(films.values());
     }
 
-    @PostMapping("/film")
+    @PostMapping()
     public Film createFilm(@RequestBody Film film) throws ValidationException {
         log.info("Вызываем метод добавления фильма... через POST /film");
         film.validate();
@@ -34,16 +34,20 @@ public class FilmController {
         return film;
     }
 
-    @PutMapping("/film")
-    public void updateFilm(@RequestBody Film film) throws FilmException, ValidationException {
+    @PutMapping()
+    public Film updateFilm(@RequestBody Film film) throws FilmException, ValidationException {
         log.info("Вызываем метод изменения фильма... через PUT /film");
         film.validate();
         if (film.getId() != null) {
-            films.put(film.getId(), film);
+            if (films.containsKey(film.getId())) {
+                films.replace(film.getId(), film);
+            } else {
+                throw new FilmException("film id invalid");
+            }
         } else {
             throw new FilmException("film id not found");
         }
-
+        return film;
     }
 
 }

@@ -17,7 +17,7 @@ public class User {
     private String email;
     private String login;
     private String name;
-    @JsonFormat(pattern = "dd.MM.yyyy")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate birthday;
 
     public void validate() throws ValidationException {
@@ -25,7 +25,7 @@ public class User {
         if ((this.email == null) || (this.email.isEmpty()) || (!this.email.contains("@"))) {
             throw new ValidationException("user email invalid");
         }
-        if ((this.login == null) || (this.login.isEmpty()) || (!this.login.contains(" "))) {
+        if ((this.login == null) || (this.login.isEmpty()) || (this.login.contains(" "))) {
             throw new ValidationException("user login invalid");
         }
         if ((this.name == null) || (this.name.isEmpty())) {

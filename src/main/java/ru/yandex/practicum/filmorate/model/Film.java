@@ -14,8 +14,7 @@ public class Film {
     private Integer id;
     private String name;
     private String description;
-
-    @JsonFormat(pattern = "dd.MM.yyyy")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate releaseDate;
 
     private int duration;
@@ -28,8 +27,11 @@ public class Film {
         if (this.description.length() > 200) {
             throw new ValidationException("film description length > 200");
         }
-        if (this.releaseDate.isBefore(LocalDate.of(1985, 12, 28))) {
+        if (this.releaseDate.isBefore(LocalDate.of(1895, 12, 28))) {
             throw new ValidationException("film releaseDate < 28.12.1985");
+        }
+        if (this.duration < 0) {
+            throw new ValidationException("film duration < 0");
         }
     }
 }

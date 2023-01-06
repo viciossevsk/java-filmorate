@@ -19,30 +19,35 @@ public class UserController {
     private Map<Integer, User> users = new HashMap<>();
     private int generatorId;
 
-    @GetMapping("/users")
+    @GetMapping()
     public List<User> getAllUsers() {
         log.info("Вызываем метод getAllUsers... через GET /users");
         return new ArrayList<>(users.values());
     }
 
-    @PostMapping("/user")
-    public void createUser(@RequestBody User user) throws ValidationException {
+    @PostMapping()
+    public User createUser(@RequestBody User user) throws ValidationException {
         log.info("Вызываем метод добавления пользователя... через POST /user");
         user.validate();
         user.setId(++generatorId);
         users.put(user.getId(), user);
+        return user;
     }
 
-    @PutMapping("/user")
-    public void updateUser(@RequestBody User user) throws UserException, ValidationException {
+    @PutMapping()
+    public User updateUser(@RequestBody User user) throws UserException, ValidationException {
         log.info("Вызываем метод изменения пользователя... через PUT /user");
         user.validate();
         if (user.getId() != null) {
-            users.put(user.getId(), user);
+            if (users.containsKey(user.getId())) {
+                users.replace(user.getId(), user);
+            } else {
+                throw new UserException("user id invalid");
+            }
         } else {
             throw new UserException("user id not found");
         }
-
+        return user;
     }
 
 }
