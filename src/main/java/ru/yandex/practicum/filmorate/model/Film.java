@@ -1,16 +1,14 @@
 package ru.yandex.practicum.filmorate.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
-import org.springframework.boot.convert.DurationFormat;
-import org.springframework.boot.convert.DurationStyle;
+import lombok.extern.slf4j.Slf4j;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 
-import java.time.Duration;
 import java.time.LocalDate;
 
 @Data
+@Slf4j
 public class Film {
 
     private Integer id;
@@ -20,15 +18,10 @@ public class Film {
     @JsonFormat(pattern = "dd.MM.yyyy")
     private LocalDate releaseDate;
 
-    @DurationFormat(DurationStyle.SIMPLE)
-    private Duration duration;
-
-    @JsonProperty("duration")
-    public long getDurationMinutes() {
-        return duration.toMinutes();
-    }
+    private int duration;
 
     public void validate() throws ValidationException {
+        log.trace("Вызываем метод Film.validate");
         if ((this.name == null) || (this.name.isEmpty())) {
             throw new ValidationException("film name invalid");
         }
