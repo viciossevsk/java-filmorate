@@ -48,10 +48,10 @@ public class FilmController {
             if (films.containsKey(film.getId())) {
                 films.replace(film.getId(), film);
             } else {
-                throw new FilmException(stringToGreenColor("film id invalid"));
+                throw new FilmException("film id invalid");
             }
         } else {
-            throw new FilmException(stringToGreenColor("film id not found"));
+            throw new FilmException("film id not found");
         }
         return film;
     }
@@ -59,16 +59,16 @@ public class FilmController {
     public void validate(Film film) throws ValidationException {
         log.trace(stringToGreenColor("call method validate for film"));
         if ((film.getName() == null) || (film.getName().isEmpty())) {
-            throw new ValidationException(stringToGreenColor("film name invalid"));
+            throw new ValidationException("film name invalid");
         }
         if (film.getDescription().length() > 200) {
-            throw new ValidationException(stringToGreenColor("film description length > 200"));
+            throw new ValidationException("film description length > 200");
         }
         if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
-            throw new ValidationException(stringToGreenColor("film releaseDate < 28.12.1985"));
+            throw new ValidationException("film releaseDate < 28.12.1985");
         }
         if (film.getDuration() < 0) {
-            throw new ValidationException(stringToGreenColor("film duration < 0"));
+            throw new ValidationException("film duration < 0");
         }
     }
 

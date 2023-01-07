@@ -48,27 +48,27 @@ public class UserController {
             if (users.containsKey(user.getId())) {
                 users.replace(user.getId(), user);
             } else {
-                throw new UserException(stringToGreenColor("user id invalid"));
+                throw new UserException("user id invalid");
             }
         } else {
-            throw new UserException(stringToGreenColor("user id not found"));
+            throw new UserException("user id not found");
         }
         return user;
     }
 
     public void validate(User user) throws ValidationException {
-        log.trace(stringToGreenColor("call method validate user"));
+        log.trace("call method validate user");
         if ((user.getEmail() == null) || (user.getEmail().isEmpty()) || (!user.getEmail().contains("@"))) {
-            throw new ValidationException(stringToGreenColor("user email invalid"));
+            throw new ValidationException("user email invalid");
         }
         if ((user.getLogin() == null) || (user.getLogin().isEmpty()) || (user.getLogin().contains(" "))) {
-            throw new ValidationException(stringToGreenColor("user login invalid"));
+            throw new ValidationException("user login invalid");
         }
         if ((user.getName() == null) || (user.getName().isEmpty())) {
             user.setName(user.getLogin());
         }
         if (user.getBirthday().isAfter(now())) {
-            throw new ValidationException(stringToGreenColor("user birthday in future"));
+            throw new ValidationException("user birthday in future");
         }
     }
 
