@@ -7,6 +7,6 @@ public class FilmException extends Throwable {
 
     public FilmException(String message) {
         super(message);
-        log.info("Вызвано исключение FilmException:" + message);
+        log.info("call FilmException:" + message);
     }
 }

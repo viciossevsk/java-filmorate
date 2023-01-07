@@ -8,6 +8,6 @@ public class UserException extends Throwable {
     public UserException(String message) {
 
         super(message);
-        log.info("Вызвано исключение UserException:" + message);
+        log.info("call UserException:" + message);
     }
 }

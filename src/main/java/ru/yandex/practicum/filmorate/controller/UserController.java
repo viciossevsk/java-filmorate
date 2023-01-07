@@ -11,6 +11,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static java.time.LocalDate.now;
+import static ru.yandex.practicum.filmorate.otherFunction.AddvansedFunctions.stringToBlueColor;
+import static ru.yandex.practicum.filmorate.otherFunction.AddvansedFunctions.stringToGreenColor;
+
 @RestController
 @Slf4j
 @RequestMapping("/users")
@@ -21,14 +25,15 @@ public class UserController {
 
     @GetMapping()
     public List<User> getAllUsers() {
-        log.info("Вызываем метод getAllUsers... через GET /users");
+        log.info(stringToGreenColor("call method getAllUsers... via GET /users"));
         return new ArrayList<>(users.values());
     }
 
     @PostMapping()
     public User createUser(@RequestBody User user) throws ValidationException {
-        log.info("Вызываем метод добавления пользователя... через POST /user");
-        user.validate();
+        log.info(stringToGreenColor("call method add user... via POST /user"));
+        log.info(stringToBlueColor(user.toString()));
+        validate(user);
         user.setId(++generatorId);
         users.put(user.getId(), user);
         return user;
@@ -36,18 +41,35 @@ public class UserController {
 
     @PutMapping()
     public User updateUser(@RequestBody User user) throws UserException, ValidationException {
-        log.info("Вызываем метод изменения пользователя... через PUT /user");
-        user.validate();
+        log.info(stringToGreenColor("call method update user... via PUT /user"));
+        log.info(stringToBlueColor(user.toString()));
+        validate(user);
         if (user.getId() != null) {
             if (users.containsKey(user.getId())) {
                 users.replace(user.getId(), user);
             } else {
-                throw new UserException("user id invalid");
+                throw new UserException(stringToGreenColor("user id invalid"));
             }
         } else {
-            throw new UserException("user id not found");
+            throw new UserException(stringToGreenColor("user id not found"));
         }
         return user;
+    }
+
+    public void validate(User user) throws ValidationException {
+        log.trace(stringToGreenColor("call method validate user"));
+        if ((user.getEmail() == null) || (user.getEmail().isEmpty()) || (!user.getEmail().contains("@"))) {
+            throw new ValidationException(stringToGreenColor("user email invalid"));
+        }
+        if ((user.getLogin() == null) || (user.getLogin().isEmpty()) || (user.getLogin().contains(" "))) {
+            throw new ValidationException(stringToGreenColor("user login invalid"));
+        }
+        if ((user.getName() == null) || (user.getName().isEmpty())) {
+            user.setName(user.getLogin());
+        }
+        if (user.getBirthday().isAfter(now())) {
+            throw new ValidationException(stringToGreenColor("user birthday in future"));
+        }
     }
 
 }

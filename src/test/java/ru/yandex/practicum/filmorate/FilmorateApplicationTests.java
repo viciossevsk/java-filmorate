@@ -131,7 +131,6 @@ class FilmorateApplicationTests {
         Assertions.assertEquals("film duration < 0", thrown.getMessage());
 
     }
-//--------------------
 
     @Test
     void correctUser() throws ValidationException {

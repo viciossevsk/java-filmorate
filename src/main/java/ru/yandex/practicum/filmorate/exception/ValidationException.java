@@ -8,6 +8,6 @@ public class ValidationException extends Throwable {
     public ValidationException(String message) {
 
         super(message);
-        log.info("Вызвано исключение ValidationException:" + message);
+        log.info("call ValidationException:" + message);
     }
 }
