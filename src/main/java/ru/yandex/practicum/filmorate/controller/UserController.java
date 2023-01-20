@@ -1,17 +1,13 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.UserException;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import static java.time.LocalDate.now;
 import static ru.yandex.practicum.filmorate.otherFunction.AddvansedFunctions.stringToBlueColor;
 import static ru.yandex.practicum.filmorate.otherFunction.AddvansedFunctions.stringToGreenColor;
 
@@ -19,57 +15,79 @@ import static ru.yandex.practicum.filmorate.otherFunction.AddvansedFunctions.str
 @Slf4j
 @RequestMapping("/users")
 public class UserController {
+    UserService userService;
 
-    private Map<Integer, User> users = new HashMap<>();
-    private int generatorId;
+    @Autowired
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
 
+    /***
+     *
+     * показать всех юзеров
+     */
     @GetMapping()
     public List<User> getAllUsers() {
         log.info(stringToGreenColor("call method getAllUsers... via GET /users"));
-        return new ArrayList<>(users.values());
+        return userService.getAllUsers();
     }
 
     @PostMapping()
-    public User createUser(@RequestBody User user) throws ValidationException {
-        log.info(stringToGreenColor("call method add user... via POST /user"));
+    public User createUser(@RequestBody User user) {
+        log.info(stringToGreenColor("call method add user... via POST /users"));
         log.info(stringToBlueColor(user.toString()));
-        validate(user);
-        user.setId(++generatorId);
-        users.put(user.getId(), user);
-        return user;
+        return userService.createUser(user);
     }
 
     @PutMapping()
-    public User updateUser(@RequestBody User user) throws UserException, ValidationException {
-        log.info(stringToGreenColor("call method update user... via PUT /user"));
+    public User updateUser(@RequestBody User user) {
+        log.info(stringToGreenColor("call method update user... via PUT /users"));
         log.info(stringToBlueColor(user.toString()));
-        validate(user);
-        if (user.getId() != null) {
-            if (users.containsKey(user.getId())) {
-                users.replace(user.getId(), user);
-            } else {
-                throw new UserException("user id invalid");
-            }
-        } else {
-            throw new UserException("user id not found");
-        }
-        return user;
+        return userService.updateUser(user);
     }
 
-    public void validate(User user) throws ValidationException {
-        log.trace("call method validate user");
-        if ((user.getEmail() == null) || (user.getEmail().isEmpty()) || (!user.getEmail().contains("@"))) {
-            throw new ValidationException("user email invalid");
-        }
-        if ((user.getLogin() == null) || (user.getLogin().isEmpty()) || (user.getLogin().contains(" "))) {
-            throw new ValidationException("user login invalid");
-        }
-        if ((user.getName() == null) || (user.getName().isEmpty())) {
-            user.setName(user.getLogin());
-        }
-        if (user.getBirthday().isAfter(now())) {
-            throw new ValidationException("user birthday in future");
-        }
+    @DeleteMapping("/{id}")
+    public void deleteUser(@PathVariable Integer id) {
+        log.info(stringToGreenColor("call method add user... via DELETE /users"));
+        userService.deleteUser(id);
+    }
+
+    /**
+     * добавление в друзья.
+     *
+     * @param id       - к кому добавляем
+     * @param friendId - кого добавляем
+     */
+    @PutMapping(value = "/{id}/friends/{friendId}")
+    public void addFriend(@PathVariable Integer id, @PathVariable Integer friendId) {
+        userService.addFriend(id, friendId);
+    }
+
+    /**
+     * удалить из друзей.
+     *
+     * @param id       - у кого удаляем друга
+     * @param friendId - кого удаляем
+     */
+    @DeleteMapping(value = "/{id}/friends/{friendId}")
+    public void deleteFriend(@PathVariable Integer id, @PathVariable Integer friendId) {
+        userService.deleteFriend(id, friendId);
+    }
+
+    /**
+     * возвращаем список пользователей, являющихся его друзьями
+     */
+    @GetMapping(value = "/{id}/friends")
+    public List<User> getAllFriends(@PathVariable Integer id) {
+        return userService.getAllFriends(id);
+    }
+
+    /**
+     * список друзей, общих с другим пользователем.
+     */
+    @GetMapping(value = "/{id}/friends/common/{otherId}")
+    public List<User> getCommonFriends(@PathVariable Integer id, @PathVariable Integer otherId) {
+        return userService.getCommonFriends(id, otherId);
     }
 
 }
