@@ -3,7 +3,7 @@ package ru.yandex.practicum.filmorate.exception;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class FilmException extends Throwable {
+public class FilmException extends RuntimeException {
 
     public FilmException(String message) {
         super(message);
