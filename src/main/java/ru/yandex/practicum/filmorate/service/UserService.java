@@ -1,7 +1,7 @@
 package ru.yandex.practicum.filmorate.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
@@ -13,14 +13,10 @@ import static ru.yandex.practicum.filmorate.otherFunction.AddvansedFunctions.str
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class UserService {
 
-    UserStorage userStorage;
-
-    @Autowired
-    public UserService(UserStorage userStorage) {
-        this.userStorage = userStorage;
-    }
+    private final UserStorage userStorage;
 
     public List<User> getAllUsers() {
         log.info(stringToGreenColor("call method getAllUsers in UserStorage... via GET /users"));
@@ -35,11 +31,6 @@ public class UserService {
     public User updateUser(User user) {
         log.info(stringToGreenColor("call method update user in UserStorage... via PUT /users"));
         return userStorage.updateUser(user);
-    }
-
-    public void deleteUser(Integer id) {
-        log.info(stringToGreenColor("call method delete user in UserStorage... via POST /users"));
-        userStorage.deleteUser(id);
     }
 
     public void addFriend(Integer id, Integer friendId) {

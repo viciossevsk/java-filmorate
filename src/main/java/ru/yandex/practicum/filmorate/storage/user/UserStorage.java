@@ -14,8 +14,6 @@ public interface UserStorage {
 
     User getUser(Integer id);
 
-    void deleteUser(Integer id);
-
     void validate(User user);
 
 

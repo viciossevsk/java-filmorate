@@ -1,21 +1,16 @@
 package ru.yandex.practicum.filmorate.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.extern.slf4j.Slf4j;
+import lombok.Builder;
+import lombok.Data;
 import ru.yandex.practicum.filmorate.exception.UserException;
 
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
-
-@Slf4j
-@Setter
-@Getter
-@ToString
+@Data
+@Builder
 public class User {
 
     private Integer id;
@@ -24,15 +19,7 @@ public class User {
     private String name;
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate birthday;
-    private Set<Integer> friends = new HashSet<>();
-
-    public User(Integer id, String email, String login, String name, LocalDate birthday) {
-        this.id = id;
-        this.email = email;
-        this.login = login;
-        this.name = name;
-        this.birthday = birthday;
-    }
+    private final Set<Integer> friends = new HashSet<>();
 
     public void setFriend(Integer friendId) {
         if (friendId != null) {

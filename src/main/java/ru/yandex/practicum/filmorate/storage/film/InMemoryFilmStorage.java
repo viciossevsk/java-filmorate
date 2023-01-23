@@ -12,13 +12,28 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static ru.yandex.practicum.filmorate.otherFunction.AddvansedFunctions.stringToBlueColor;
 import static ru.yandex.practicum.filmorate.otherFunction.AddvansedFunctions.stringToGreenColor;
 
 @Slf4j
 @Component
 public class InMemoryFilmStorage implements FilmStorage {
 
-    private Map<Integer, Film> films = new HashMap<>();
+    private final Map<Integer, Film> films = new HashMap<>();
+
+    @Override
+    public Film getFilm(Integer id) {
+        if (id != null) {
+            if (films.containsKey(id)) {
+                return films.get(id);
+            } else {
+                throw new FilmException("film id is empty");
+            }
+        } else {
+            throw new FilmException("film id=" + id + " not found");
+        }
+    }
+
     private int generatorId;
 
     @Override
@@ -29,10 +44,11 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Film createFilm(Film film) {
-        log.info(stringToGreenColor("add film... via POST /film"));
         validate(film);
         film.setId(++generatorId);
         films.put(film.getId(), film);
+        log.info(stringToGreenColor("add film... via POST /film"));
+        log.info(stringToBlueColor(film.toString()));
         return film;
     }
 
