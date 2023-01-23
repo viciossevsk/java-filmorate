@@ -40,13 +40,15 @@ public class UserService {
 
     public void addFriend(Integer id, Integer friendId) {
         User user = userStorage.getUser(id);
-        user.setFriend(friendId);
+        User friend = userStorage.getUser(friendId);
+        user.setFriend(friend.getId());
 
     }
 
     public void deleteFriend(Integer id, Integer friendId) {
         User user = userStorage.getUser(id);
-        user.deleteFriend(friendId);
+        User friend = userStorage.getUser(friendId);
+        user.deleteFriend(friend.getId());
     }
 
     /**
