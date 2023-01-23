@@ -18,6 +18,11 @@ public class UserService {
 
     private final UserStorage userStorage;
 
+    public User getUser(Integer id) {
+        log.info(stringToGreenColor("call method getUser in UserStorage... via GET /users"));
+        return userStorage.getUser(id);
+    }
+
     public List<User> getAllUsers() {
         log.info(stringToGreenColor("call method getAllUsers in UserStorage... via GET /users"));
         return userStorage.getAllUsers();

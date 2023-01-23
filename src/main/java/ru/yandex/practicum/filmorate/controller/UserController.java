@@ -45,6 +45,15 @@ public class UserController {
         return userService.updateUser(user);
     }
 
+    /***
+     * получаем юзера по ИД
+     */
+    @GetMapping("/{id}")
+    public User getUser(@PathVariable Integer id) {
+        log.info(stringToGreenColor("call method getUser... via GET /users"));
+        return userService.getUser(id);
+    }
+
     /**
      * добавление в друзья.
      *
