@@ -42,6 +42,7 @@ public class UserService {
         User user = userStorage.getUser(id);
         User friend = userStorage.getUser(friendId);
         user.setFriend(friend.getId());
+        friend.setFriend(user.getId());
 
     }
 
@@ -49,6 +50,7 @@ public class UserService {
         User user = userStorage.getUser(id);
         User friend = userStorage.getUser(friendId);
         user.deleteFriend(friend.getId());
+        friend.deleteFriend(user.getId());
     }
 
     /**

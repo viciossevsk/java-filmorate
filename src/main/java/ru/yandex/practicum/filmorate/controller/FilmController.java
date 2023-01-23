@@ -34,6 +34,11 @@ public class FilmController {
         return filmService.createFilm(film);
     }
 
+    @GetMapping("/{id}")
+    public Film getFilm(@PathVariable Integer id) {
+        return filmService.getFilm(id);
+    }
+
     @PutMapping()
     public Film updateFilm(@RequestBody Film film) {
         log.info(stringToGreenColor("call method update film... via PUT /film"));
