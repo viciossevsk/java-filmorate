@@ -63,7 +63,7 @@ public class FilmService {
     public List<Film> getMostPopularFilms(Integer count) {
         log.info(stringToGreenColor("getAllFilms... "));
         return filmStorage.getAllFilms().stream()
-                .sorted(Comparator.comparing(film -> getAllFilms().size() * -1))
+                .sorted(Comparator.comparing(film -> film.getLikes().size() * -1))
                 .limit(count)
                 .collect(Collectors.toList());
     }
