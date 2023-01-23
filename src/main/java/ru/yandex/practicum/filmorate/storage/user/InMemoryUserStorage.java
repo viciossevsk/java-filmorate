@@ -18,8 +18,8 @@ import static ru.yandex.practicum.filmorate.otherFunction.AddvansedFunctions.str
 @Component
 public class InMemoryUserStorage implements UserStorage {
 
-    private Map<Integer, User> users = new HashMap<>();
-    private int generatorId;
+    private final Map<Integer, User> users = new HashMap<>();
+    private int generatorId = 0;
 
     public List<User> getAllUsers() {
         log.info(stringToGreenColor("getAllUsers..."));
@@ -56,21 +56,7 @@ public class InMemoryUserStorage implements UserStorage {
             if (users.containsKey(id)) {
                 return users.get(id);
             } else {
-                throw new UserException("user id is empty");
-            }
-        } else {
-            throw new UserException("user id=" + id + " not found");
-        }
-    }
-
-    @Override
-    public void deleteUser(Integer id) {
-        log.info(stringToGreenColor("delete user..."));
-        if (id != null) {
-            if (users.containsKey(id)) {
-                users.remove(id);
-            } else {
-                throw new UserException(String.format("user with id = %s not found", id));
+                throw new UserException("user id=" + id + " not found");
             }
         } else {
             throw new UserException("user id is empty");

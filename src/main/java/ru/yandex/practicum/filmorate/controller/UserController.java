@@ -23,7 +23,6 @@ public class UserController {
     }
 
     /***
-     *
      * показать всех юзеров
      */
     @GetMapping()
@@ -44,12 +43,6 @@ public class UserController {
         log.info(stringToGreenColor("call method update user... via PUT /users"));
         log.info(stringToBlueColor(user.toString()));
         return userService.updateUser(user);
-    }
-
-    @DeleteMapping("/{id}")
-    public void deleteUser(@PathVariable Integer id) {
-        log.info(stringToGreenColor("call method add user... via DELETE /users"));
-        userService.deleteUser(id);
     }
 
     /**
