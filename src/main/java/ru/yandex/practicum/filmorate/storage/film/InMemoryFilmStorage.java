@@ -20,6 +20,7 @@ import static ru.yandex.practicum.filmorate.otherFunction.AddvansedFunctions.str
 public class InMemoryFilmStorage implements FilmStorage {
 
     private final Map<Integer, Film> films = new HashMap<>();
+    private int generatorId;
 
     @Override
     public Film getFilm(Integer id) {
@@ -33,8 +34,6 @@ public class InMemoryFilmStorage implements FilmStorage {
             throw new FilmException("film id=" + id + " not found");
         }
     }
-
-    private int generatorId;
 
     @Override
     public List<Film> getAllFilms() {
@@ -68,7 +67,6 @@ public class InMemoryFilmStorage implements FilmStorage {
         return film;
     }
 
-    @Override
     public void validate(Film film) {
         log.trace(stringToGreenColor("validate for film"));
         if ((film.getName() == null) || (film.getName().isEmpty())) {
@@ -83,5 +81,12 @@ public class InMemoryFilmStorage implements FilmStorage {
         if (film.getDuration() < 0) {
             throw new ValidationException("film duration < 0");
         }
+    }
+
+    @Override
+    public void deleteFilm(Integer id) {
+        log.info(stringToGreenColor("delete film... via DELETE /film"));
+        Film film = getFilm(id);
+        films.remove(film.getId());
     }
 }

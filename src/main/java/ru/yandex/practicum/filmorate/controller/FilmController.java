@@ -15,7 +15,7 @@ import static ru.yandex.practicum.filmorate.otherFunction.AddvansedFunctions.str
 @RequestMapping("/films")
 public class FilmController {
 
-    FilmService filmService;
+    private FilmService filmService;
 
     @Autowired
     public FilmController(FilmService filmService) {
@@ -37,6 +37,11 @@ public class FilmController {
     @GetMapping("/{id}")
     public Film getFilm(@PathVariable Integer id) {
         return filmService.getFilm(id);
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteFilm(@PathVariable Integer id) {
+        filmService.deleteFilm(id);
     }
 
     @PutMapping()

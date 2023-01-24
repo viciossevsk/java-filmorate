@@ -39,6 +39,9 @@ public class FilmService {
         return filmStorage.updateFilm(film);
     }
 
+    public void deleteFilm(Integer id) {
+        filmStorage.deleteFilm(id);
+    }
 
     public void addLikeToFilm(Integer id, Integer userId) {
         log.info(stringToGreenColor("add like film..."));

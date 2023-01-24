@@ -15,7 +15,7 @@ import static ru.yandex.practicum.filmorate.otherFunction.AddvansedFunctions.str
 @Slf4j
 @RequestMapping("/users")
 public class UserController {
-    UserService userService;
+    private UserService userService;
 
     @Autowired
     public UserController(UserService userService) {
@@ -43,6 +43,11 @@ public class UserController {
         log.info(stringToGreenColor("call method update user... via PUT /users"));
         log.info(stringToBlueColor(user.toString()));
         return userService.updateUser(user);
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteUser(@PathVariable Integer id) {
+        userService.deleteUser(id);
     }
 
     /***
