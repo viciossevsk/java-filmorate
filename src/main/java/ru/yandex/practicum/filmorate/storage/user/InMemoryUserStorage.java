@@ -4,12 +4,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.UserException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static java.time.LocalDate.now;
 import static ru.yandex.practicum.filmorate.otherFunction.AddvansedFunctions.stringToGreenColor;
@@ -48,6 +46,27 @@ public class InMemoryUserStorage implements UserStorage {
             throw new UserException("user id not found");
         }
         return user;
+    }
+
+    @Override
+    public void deleteUser(Integer id, List<Film> films) {
+        log.info(stringToGreenColor("delete user... via DELETE /user"));
+        User user = getUser(id);
+        users.remove(user.getId());
+        log.info(stringToGreenColor("delete user from friends... via DELETE /user"));
+        for (User friend : users.values()) {
+            Set<Integer> friendsOfFriend = friend.getFriends();
+            if (friendsOfFriend.contains(id)) {
+                friendsOfFriend.remove(id);
+            }
+        }
+        log.info(stringToGreenColor("delete user likes from films... via DELETE /user"));
+        for (Film film : films) {
+            Set<Integer> likes = film.getLikes();
+            if (likes.contains(id)) {
+                likes.remove(id);
+            }
+        }
     }
 
     @Override
