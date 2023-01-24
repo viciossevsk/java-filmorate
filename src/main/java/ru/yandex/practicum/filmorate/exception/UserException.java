@@ -3,11 +3,9 @@ package ru.yandex.practicum.filmorate.exception;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class UserException extends Throwable {
+public class UserException extends RuntimeException {
 
     public UserException(String message) {
-
         super(message);
-        log.info("call UserException:" + message);
     }
 }

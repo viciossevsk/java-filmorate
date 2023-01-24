@@ -1,15 +1,7 @@
 package ru.yandex.practicum.filmorate.otherFunction;
 
 
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.time.format.DateTimeFormatter;
-
 public class AddvansedFunctions {
-
-    public final static DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
-
-    public static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
 
     public static final String ANSI_RESET = "\u001B[0m";
     public static final String ANSI_BLACK = "\u001B[30m";
@@ -29,5 +21,8 @@ public class AddvansedFunctions {
         return ANSI_GREEN + text + ANSI_RESET;
     }
 
+    public static String stringToRedColor(String text) {
+        return ANSI_RED + text + ANSI_RESET;
+    }
 
 }

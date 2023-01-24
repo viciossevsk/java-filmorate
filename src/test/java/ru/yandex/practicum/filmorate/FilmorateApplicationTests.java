@@ -10,6 +10,12 @@ import ru.yandex.practicum.filmorate.controller.UserController;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.service.UserService;
+import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
+import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.time.LocalDate;
 
@@ -19,14 +25,18 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @SpringBootTest
 class FilmorateApplicationTests {
 
-    FilmController filmController;
-    UserController userController;
+    private FilmController filmController;
+    private FilmStorage inMemoryFilmStorage;
+    private UserController userController;
+    private UserStorage inMemoryUserStorage;
 
     @BeforeEach
     void create() {
+        inMemoryFilmStorage = new InMemoryFilmStorage();
+        inMemoryUserStorage = new InMemoryUserStorage();
 
-        filmController = new FilmController();
-        userController = new UserController();
+        filmController = new FilmController(new FilmService(inMemoryFilmStorage, inMemoryUserStorage));
+        userController = new UserController(new UserService(inMemoryUserStorage, inMemoryFilmStorage));
     }
 
     @AfterEach
