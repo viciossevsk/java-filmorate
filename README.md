@@ -91,7 +91,12 @@ SELECT * FROM film WHERE film_id = 1;
 ``` sql
 SELECT f.*
 FROM film f
-LEFT JOIN film_likes fl USING(film_id)
-GROUP BY f.film_id
-ORDER BY COUNT(DISTINCT fl.user_id) DESC LIMIT 10;
+LEFT JOIN film_likes fl on f.id = fl.film_id
+GROUP BY f.id, f.name
+order by count(*) desc 
+limit 
+case 
+  when p_limit is not null
+     then p_limit
+  else 10 end
 ```
