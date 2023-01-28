@@ -49,6 +49,7 @@ SELECT *
   FROM USER u
  INNER JOIN friendship f ON u.user_id = f.user_id
  WHERE u.user_id = 1
+ AND f.confrimed_id = 2; -- только друзья подтвердивщие заявку
 ```
 
 2) Get common friends of users 1 and 2
@@ -58,10 +59,11 @@ SELECT *
   FROM USER u
  WHERE u.id IN (SELECT f.friend_user_id
                   FROM friendship f
-                 WHERE f.user_id = 1
-                       OR f.user_id = 2
+                 WHERE (f.user_id = 1
+                       OR f.user_id = 2)
+                       AND f.confrimed_id = 2 -- только друзья подтвердивщие заявку
                  GROUP BY f.friend_user_id
-                HAVING COUNT(*) > 1)
+                HAVING COUNT(*) > 1);
 ```
 
 3) Get all users
