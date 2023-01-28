@@ -42,8 +42,6 @@ where u.user_id = 1
 
 ============== SELECT запросы ==============
 
-# <span style="color:blue">проверял на ORACLE</span>
-
 1) Get friends of user 1
 
 ``` sql
