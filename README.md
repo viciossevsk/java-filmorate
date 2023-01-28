@@ -1,2 +1,3 @@
 # java-filmorate
-Template repository for Filmorate project.
+
+![DB flow chart](ER_sheme.JPG)
