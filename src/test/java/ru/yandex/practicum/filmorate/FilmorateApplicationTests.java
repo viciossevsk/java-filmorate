@@ -18,6 +18,8 @@ import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -49,12 +51,15 @@ class FilmorateApplicationTests {
     @Test
     void correctFilm() throws ValidationException {
 
+        Set<Integer> likes = new HashSet<>();
+
         Film corrFilm = Film.builder()
                 .id(1)
                 .name("Жара")
                 .description("Документальный фильм про солнце")
                 .releaseDate(LocalDate.of(1990, 5, 6))
                 .duration(100)
+                .likes(likes)
                 .build();
 
         Film film = Film.builder()
@@ -102,7 +107,7 @@ class FilmorateApplicationTests {
             filmController.createFilm(film);
         }, "ValidationException was expected");
 
-        Assertions.assertEquals("film description length > 200", thrown.getMessage());
+        Assertions.assertEquals("Film description may not exceed 200 symbols", thrown.getMessage());
 
     }
 
@@ -120,7 +125,7 @@ class FilmorateApplicationTests {
             filmController.createFilm(film);
         }, "ValidationException was expected");
 
-        Assertions.assertEquals("film releaseDate < 28.12.1985", thrown.getMessage());
+        Assertions.assertEquals("Invalid film release date", thrown.getMessage());
 
     }
 
@@ -138,12 +143,14 @@ class FilmorateApplicationTests {
             filmController.createFilm(film);
         }, "ValidationException was expected");
 
-        Assertions.assertEquals("film duration < 0", thrown.getMessage());
+        Assertions.assertEquals("Duration must be positive number", thrown.getMessage());
 
     }
 
     @Test
     void correctUser() throws ValidationException {
+
+        Set<Integer> friends = new HashSet<>();
 
         User corrUser = User.builder()
                 .id(1)
@@ -151,6 +158,7 @@ class FilmorateApplicationTests {
                 .login("qwerty")
                 .name("pavel")
                 .birthday(LocalDate.of(1990, 5, 6))
+                .friends(friends)
                 .build();
 
         User user = User.builder()
@@ -195,7 +203,7 @@ class FilmorateApplicationTests {
             userController.createUser(user);
         }, "ValidationException was expected");
 
-        Assertions.assertEquals("user login invalid", thrown.getMessage());
+        Assertions.assertEquals("Login is empty", thrown.getMessage());
 
     }
 
@@ -213,7 +221,7 @@ class FilmorateApplicationTests {
             userController.createUser(user);
         }, "ValidationException was expected");
 
-        Assertions.assertEquals("user birthday in future", thrown.getMessage());
+        Assertions.assertEquals("Birthday must not be a date in future", thrown.getMessage());
 
     }
 
