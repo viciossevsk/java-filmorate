@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.storage.user;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.UserException;
+import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
@@ -43,15 +44,37 @@ public class InMemoryUserStorage implements UserStorage {
                 throw new UserException("user id invalid");
             }
         } else {
-            throw new UserException("user id not found");
+            throw new UserNotFoundException("user id not found");
         }
         return user;
     }
 
     @Override
+    public void addFriend(int userId, int friendId) {
+        User user = getUserById(userId);
+        User friend = getUserById(friendId);
+        if ((friend.getId() != null) && (user.getId() != null)) {
+            Set<Integer> friends = user.getFriends();
+            friends.add(friend.getId());
+            user.setFriends(friends);
+        }
+    }
+
+    @Override
+    public void deleteFriend(int userId, int friendId) {
+        User user = getUserById(userId);
+        User friend = getUserById(friendId);
+        if ((friend.getId() != null) && (user.getId() != null)) {
+            Set<Integer> friends = user.getFriends();
+            friends.remove(friend.getId());
+            user.setFriends(friends);
+        }
+    }
+
+    @Override
     public void deleteUser(Integer id, List<Film> films) {
         log.info(stringToGreenColor("delete user... via DELETE /user"));
-        User user = getUser(id);
+        User user = getUserById(id);
         users.remove(user.getId());
         log.info(stringToGreenColor("delete user from friends... via DELETE /user"));
         for (User friend : users.values()) {
@@ -70,12 +93,12 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public User getUser(Integer id) {
+    public User getUserById(Integer id) {
         if (id != null) {
             if (users.containsKey(id)) {
                 return users.get(id);
             } else {
-                throw new UserException("user id=" + id + " not found");
+                throw new UserNotFoundException("user id=" + id + " not found");
             }
         } else {
             throw new UserException("user id is empty");

@@ -13,8 +13,12 @@ public interface UserStorage {
 
     User updateUser(User user);
 
-    User getUser(Integer id);
+    User getUserById(Integer userId);
 
-    void deleteUser(Integer id, List<Film> films);
+    void deleteUser(Integer userId, List<Film> films);
+
+    void addFriend(int userId, int friendId);
+
+    void deleteFriend(int userId, int friendId);
 
 }

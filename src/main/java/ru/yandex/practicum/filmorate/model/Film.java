@@ -3,10 +3,12 @@ package ru.yandex.practicum.filmorate.model;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NonNull;
 import ru.yandex.practicum.filmorate.exception.UserException;
 
+import javax.validation.constraints.NotBlank;
 import java.time.LocalDate;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 @Data
@@ -14,12 +16,17 @@ import java.util.Set;
 public class Film {
 
     private Integer id;
+    @NonNull
+    @NotBlank
     private String name;
     private String description;
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate releaseDate;
-    private int duration;
-    private final Set<Integer> likes = new HashSet<>();
+    private Integer duration;
+    private Rating mpa;
+    private Set<Integer> likes;
+    private LinkedHashSet<Genre> genres;
+
 
     public void addLike(Integer userId) {
         if (userId != null) {

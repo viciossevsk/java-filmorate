@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 
+import javax.validation.Valid;
+import java.sql.SQLException;
 import java.util.List;
 
 import static ru.yandex.practicum.filmorate.otherFunction.AddvansedFunctions.stringToBlueColor;
@@ -32,16 +34,16 @@ public class UserController {
     }
 
     @PostMapping()
-    public User createUser(@RequestBody User user) {
+    public User createUser(@Valid @RequestBody User user) {
         log.info(stringToGreenColor("call method add user... via POST /users"));
         log.info(stringToBlueColor(user.toString()));
         return userService.createUser(user);
     }
 
     @PutMapping()
-    public User updateUser(@RequestBody User user) {
+    public User updateUser(@Valid @RequestBody User user) {
         log.info(stringToGreenColor("call method update user... via PUT /users"));
-        log.info(stringToBlueColor(user.toString()));
+        //  log.info(stringToBlueColor(user.toString()));
         return userService.updateUser(user);
     }
 
@@ -66,7 +68,7 @@ public class UserController {
      * @param friendId - кого добавляем
      */
     @PutMapping(value = "/{id}/friends/{friendId}")
-    public void addFriend(@PathVariable Integer id, @PathVariable Integer friendId) {
+    public void addFriend(@PathVariable Integer id, @PathVariable Integer friendId) throws SQLException {
         userService.addFriend(id, friendId);
     }
 
@@ -85,8 +87,8 @@ public class UserController {
      * возвращаем список пользователей, являющихся его друзьями
      */
     @GetMapping(value = "/{id}/friends")
-    public List<User> getAllFriends(@PathVariable Integer id) {
-        return userService.getAllFriends(id);
+    public List<User> getFriendsUser(@PathVariable Integer id) {
+        return userService.getFriendsUser(id);
     }
 
     /**
