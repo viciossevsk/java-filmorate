@@ -142,7 +142,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public void deleteFilm(Integer id) {
+    public void deleteFilmById(Integer id) {
         log.info(stringToGreenColor("delete film... via DELETE /film"));
         Film film = getFilmById(id);
         films.remove(film.getId());

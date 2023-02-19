@@ -14,7 +14,7 @@ public interface FilmStorage {
 
     Film updateFilm(Film film);
 
-    void deleteFilm(Integer id);
+    void deleteFilmById(Integer id);
 
     Film getFilmById(Integer id);
 

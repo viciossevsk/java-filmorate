@@ -37,12 +37,12 @@ public class FilmController {
 
     @GetMapping("/{id}")
     public Film getFilm(@PathVariable Integer id) {
-        return filmService.getFilm(id);
+        return filmService.getFilmById(id);
     }
 
     @DeleteMapping("/{id}")
     public void deleteFilm(@PathVariable Integer id) {
-        filmService.deleteFilm(id);
+        filmService.deleteFilmById(id);
     }
 
     @PutMapping()

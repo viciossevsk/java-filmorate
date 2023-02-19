@@ -35,6 +35,7 @@ public class FilmService {
         validateFilm(film);
         return filmStorage.createFilm(film);
     }
+
     public Film updateFilm(Film film) {
         log.info(stringToGreenColor("call method update film in FilmStorage... via PUT /film"));
         Film filmExist = filmStorage.getFilmById(film.getId());
@@ -42,8 +43,8 @@ public class FilmService {
         return filmStorage.updateFilm(film);
     }
 
-    public void deleteFilm(Integer id) {
-        filmStorage.deleteFilm(id);
+    public void deleteFilmById(Integer userId) {
+        filmStorage.deleteFilmById(userId);
     }
 
     public void addLikeToFilm(Integer filmId, Integer userId) {
@@ -53,7 +54,7 @@ public class FilmService {
         filmStorage.addLikeToFilm(filmId, userId);
     }
 
-    public Film getFilm(Integer id) {
+    public Film getFilmById(Integer id) {
         return filmStorage.getFilmById(id);
     }
 

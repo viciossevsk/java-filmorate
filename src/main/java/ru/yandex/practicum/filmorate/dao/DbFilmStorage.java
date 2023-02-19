@@ -128,7 +128,7 @@ public class DbFilmStorage implements FilmStorage {
     }
 
     @Override
-    public void deleteFilm(Integer filmId) throws FilmException {
+    public void deleteFilmById(Integer filmId) throws FilmException {
         Film filmExist = getFilmById(filmId);
         genreFilmDao.deleteAllGenreByFilm(filmId);
         filmLikesDao.deleteAllLikesByFilm(filmId);

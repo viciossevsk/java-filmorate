@@ -35,7 +35,7 @@ public class UserService {
         return userStorage.getAllUsers();
     }
 
-    public void deleteUser(Integer id) {
+    public void deleteUserById(Integer id) {
         userStorage.deleteUser(id, filmStorage.getAllFilms());
     }
 

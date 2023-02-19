@@ -48,4 +48,8 @@ public class Film {
         }
     }
 
+    public int takeCountLikes() {
+        return likes.size();
+    }
+
 }
