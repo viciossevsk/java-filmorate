@@ -42,11 +42,6 @@ public class FilmService {
         validateFilm(film);
         return filmStorage.updateFilm(film);
     }
-
-    public void deleteFilmById(Integer userId) {
-        filmStorage.deleteFilmById(userId);
-    }
-
     public void addLikeToFilm(Integer filmId, Integer userId) {
         log.info(stringToGreenColor("add like film..."));
         Film filmExist = filmStorage.getFilmById(filmId);

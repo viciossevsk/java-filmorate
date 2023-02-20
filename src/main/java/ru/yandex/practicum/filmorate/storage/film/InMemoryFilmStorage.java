@@ -140,14 +140,6 @@ public class InMemoryFilmStorage implements FilmStorage {
             throw new ValidationException("film duration < 0");
         }
     }
-
-    @Override
-    public void deleteFilmById(Integer id) {
-        log.info(stringToGreenColor("delete film... via DELETE /film"));
-        Film film = getFilmById(id);
-        films.remove(film.getId());
-    }
-
     @Override
     public List<Rating> getAllRatings() {
         return new ArrayList<>(ratings.values());

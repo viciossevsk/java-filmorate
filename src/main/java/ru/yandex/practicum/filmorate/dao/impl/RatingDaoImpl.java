@@ -17,12 +17,12 @@ import java.util.Objects;
 
 @Component
 public class RatingDaoImpl implements RatingDao {
-    private final JdbcTemplate jdbcTemplate;
     private final static String GET_ALL_RATINGS_SQL = "select * from rating";
     private final static String GET_RATING_BY_ID_SQL = "select * from rating where rating_id = ?";
     private final static String GET_RATING_ID_BY_NAME_SQL = "select rating_id from rating where name = ?";
     private final static String SET_NEW_RATING_SQL = "insert into rating (name) values(?)";
-
+    private final static String CHECK_EXIST_RATING_SQL = "select count(*) as cnt from rating where rating_id = ?";
+    private final JdbcTemplate jdbcTemplate;
 
     @Autowired
     public RatingDaoImpl(JdbcTemplate jdbcTemplate) {
@@ -42,10 +42,13 @@ public class RatingDaoImpl implements RatingDao {
 
     @Override
     public Integer getRatingIdForRatingName(String name) {
-        return jdbcTemplate.query(GET_RATING_ID_BY_NAME_SQL, (rs, rowNum) -> buildRatingId(rs), name)
-                .stream().findFirst().orElseThrow(() -> {
-                    throw new RatingNotFoundException("Rating not found");
-                });
+        Integer ratingId = jdbcTemplate.queryForObject(GET_RATING_ID_BY_NAME_SQL, (rs, rowNum) -> buildRatingId(rs),
+                                                       name);
+
+        if (ratingId == null) {
+            throw new RatingNotFoundException("Rating with name=" + name + "not found");
+        } else
+            return ratingId;
     }
 
     @Override
@@ -55,10 +58,14 @@ public class RatingDaoImpl implements RatingDao {
 
     @Override
     public Rating getRatingById(Integer ratingId) {
-        return jdbcTemplate.query(GET_RATING_BY_ID_SQL, (rs, rowNum) -> buildRating(rs), ratingId)
-                .stream().findFirst().orElseThrow(() -> {
-                    throw new RatingNotFoundException("Rating not found");
-                });
+        if (checkRatingExist(ratingId)) {
+            Rating rating = jdbcTemplate.queryForObject(GET_RATING_BY_ID_SQL, (rs, rowNum) -> buildRating(rs),
+                                                        ratingId);
+            return rating;
+        } else {
+            throw new RatingNotFoundException("Rating with id=" + ratingId + "not found");
+        }
+
     }
 
     private Rating buildRating(ResultSet rs) throws SQLException {
@@ -71,4 +78,14 @@ public class RatingDaoImpl implements RatingDao {
     private Integer buildRatingId(ResultSet rs) throws SQLException {
         return rs.getInt("rating_id");
     }
+
+    private Boolean checkRatingExist(Integer ratingId) {
+        Integer count = jdbcTemplate.queryForObject(CHECK_EXIST_RATING_SQL, Integer.class, ratingId);
+        if (count > 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
 }

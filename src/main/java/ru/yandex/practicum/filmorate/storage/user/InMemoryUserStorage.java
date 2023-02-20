@@ -5,7 +5,6 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.UserException;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
-import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.*;
@@ -68,27 +67,6 @@ public class InMemoryUserStorage implements UserStorage {
             Set<Integer> friends = user.getFriends();
             friends.remove(friend.getId());
             user.setFriends(friends);
-        }
-    }
-
-    @Override
-    public void deleteUser(Integer id, List<Film> films) {
-        log.info(stringToGreenColor("delete user... via DELETE /user"));
-        User user = getUserById(id);
-        users.remove(user.getId());
-        log.info(stringToGreenColor("delete user from friends... via DELETE /user"));
-        for (User friend : users.values()) {
-            Set<Integer> friendsOfFriend = friend.getFriends();
-            if (friendsOfFriend.contains(id)) {
-                friendsOfFriend.remove(id);
-            }
-        }
-        log.info(stringToGreenColor("delete user likes from films... via DELETE /user"));
-        for (Film film : films) {
-            Set<Integer> likes = film.getLikes();
-            if (likes.contains(id)) {
-                likes.remove(id);
-            }
         }
     }
 

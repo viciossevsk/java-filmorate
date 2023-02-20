@@ -27,29 +27,24 @@ public class UserController {
     /***
      * показать всех юзеров
      */
-    @GetMapping()
+    @GetMapping
     public List<User> getAllUsers() {
         log.info(stringToGreenColor("call method getAllUsers... via GET /users"));
         return userService.getAllUsers();
     }
 
-    @PostMapping()
+    @PostMapping
     public User createUser(@Valid @RequestBody User user) {
         log.info(stringToGreenColor("call method add user... via POST /users"));
         log.info(stringToBlueColor(user.toString()));
         return userService.createUser(user);
     }
 
-    @PutMapping()
+    @PutMapping
     public User updateUser(@Valid @RequestBody User user) {
         log.info(stringToGreenColor("call method update user... via PUT /users"));
         //  log.info(stringToBlueColor(user.toString()));
         return userService.updateUser(user);
-    }
-
-    @DeleteMapping("/{id}")
-    public void deleteUser(@PathVariable Integer id) {
-        userService.deleteUserById(id);
     }
 
     /***

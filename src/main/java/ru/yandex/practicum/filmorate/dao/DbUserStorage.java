@@ -8,7 +8,6 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.UserException;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
-import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
@@ -28,8 +27,6 @@ import static ru.yandex.practicum.filmorate.otherFunction.AddvansedFunctions.str
 @Primary
 @Slf4j
 public class DbUserStorage implements UserStorage {
-    private final JdbcTemplate jdbcTemplate;
-    private final FilmLikesDao filmLikesDao;
     private final static String GET_ALL_USERS_SQL = "select * from users";
     private final static String CHECK_EXIST_USER_SQL = "select count(*) as cnt from users where users_id = ?";
     private final static String GET_USER_BY_ID_SQL = "select * from users where users_id = ?";
@@ -47,10 +44,11 @@ public class DbUserStorage implements UserStorage {
             "email = ?, login = ?, name = ?, birthday = ? " +
             "where users_id = ?";
     private final static String DELETE_FRIENDS_BY_USER_ID_SQL = "delete from friendship where user_id = ?";
-
     private final static String DELETE_FRIENDSHIP_SQL = "delete from friendship where user_id = ? " +
             "and friend_user_id = ?";
     private final static String DELETE_USER_SQL = "delete from users where user_id = ?";
+    private final JdbcTemplate jdbcTemplate;
+    private final FilmLikesDao filmLikesDao;
 
     public DbUserStorage(JdbcTemplate jdbcTemplate, FilmLikesDao filmLikesDao) {
         this.jdbcTemplate = jdbcTemplate;
@@ -83,7 +81,6 @@ public class DbUserStorage implements UserStorage {
     @Override
     public User updateUser(User user) throws UserException {
         log.info(stringToGreenColor("call method update user... in DbUserStorage"));
-        User userExist = getUserById(user.getId());
         jdbcTemplate.update(UPDATE_USER_SQL
                 , user.getEmail()
                 , user.getLogin()
@@ -105,29 +102,22 @@ public class DbUserStorage implements UserStorage {
 
     @Override
     public void deleteFriend(int userId, int friendId) {
-        User userExist = getUserById(userId);
-        User FriendExist = getUserById(friendId);
         jdbcTemplate.update(DELETE_FRIENDSHIP_SQL, userId, friendId);
     }
 
     @Override
     public void addFriend(int userId, int friendId) {
-        User userExist = getUserById(userId);
-        User FriendExist = getUserById(friendId);
         jdbcTemplate.update(SET_NEW_FRIENDSHIP_SQL, userId, friendId);
     }
 
     @Override
     public User getUserById(Integer userId) throws UserException {
-        return jdbcTemplate.query(GET_USER_BY_ID_SQL, (rs, rowNum) -> buildUser(rs), userId)
-                .stream().findFirst().orElseThrow(() -> {
-                    throw new UserNotFoundException("User with id=" + userId + " not found");
-                });
-    }
-
-    @Override
-    public void deleteUser(Integer id, List<Film> films) {
-
+        if (checkUserExist(userId)) {
+            User user = jdbcTemplate.queryForObject(GET_USER_BY_ID_SQL, (rs, rowNum) -> buildUser(rs), userId);
+            return user;
+        } else {
+            throw new UserNotFoundException("User with id=" + userId + " not found");
+        }
     }
 
     private User buildUser(ResultSet rs) throws SQLException {
@@ -155,6 +145,14 @@ public class DbUserStorage implements UserStorage {
 
     private Integer makeUserId(ResultSet rs) throws SQLException {
         return rs.getInt("users_id");
+    }
 
+    private Boolean checkUserExist(Integer userId) {
+        Integer count = jdbcTemplate.queryForObject(CHECK_EXIST_USER_SQL, Integer.class, userId);
+        if (count > 0) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }

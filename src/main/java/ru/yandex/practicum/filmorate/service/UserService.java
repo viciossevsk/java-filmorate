@@ -34,11 +34,6 @@ public class UserService {
         log.info(stringToGreenColor("call method getAllUsers in UserStorage... via GET /users"));
         return userStorage.getAllUsers();
     }
-
-    public void deleteUserById(Integer id) {
-        userStorage.deleteUser(id, filmStorage.getAllFilms());
-    }
-
     public User createUser(User user) {
         log.info(stringToGreenColor("call method add user in UserStorage... via POST /users"));
         validateUser(user);

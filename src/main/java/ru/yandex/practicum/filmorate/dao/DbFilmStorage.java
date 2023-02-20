@@ -32,6 +32,8 @@ public class DbFilmStorage implements FilmStorage {
             "r.rating_id AS rating_id, " +
             "r.name AS rating_name FROM FILM f " +
             "left JOIN RATING r ON f.RATING_ID = r.RATING_ID";
+
+    private final static String CHECK_EXIST_FILM_SQL = "select count(*) as cnt from film where film_id = ?";
     private final static String GET_FILM_BY_ID_SQL = GET_ALL_FILMS_SQL + " where f.film_id = ?";
     private final static String GET_POPULAR_FILMS_SQL = "select f.film_id, " +
             "f.name, " +
@@ -52,7 +54,6 @@ public class DbFilmStorage implements FilmStorage {
     private final static String UPDATE_FILM_SQL = "update film set " +
             "name = ?, description = ?, release_date = ?, duration = ?, rating_id = ? " +
             "where film_id = ?";
-    private final static String DELETE_FILM_SQL = "delete from film where film_id = ?";
     private final JdbcTemplate jdbcTemplate;
     private final RatingDao ratingDao;
     private final GenreDao genreDao;
@@ -97,7 +98,6 @@ public class DbFilmStorage implements FilmStorage {
 
     @Override
     public Film updateFilm(Film film) throws FilmException {
-        Film filmExist = getFilmById(film.getId());
         jdbcTemplate.update(UPDATE_FILM_SQL
                 , film.getName()
                 , film.getDescription()
@@ -128,24 +128,18 @@ public class DbFilmStorage implements FilmStorage {
     }
 
     @Override
-    public void deleteFilmById(Integer filmId) throws FilmException {
-        Film filmExist = getFilmById(filmId);
-        genreFilmDao.deleteAllGenreByFilm(filmId);
-        filmLikesDao.deleteAllLikesByFilm(filmId);
-        jdbcTemplate.update(DELETE_FILM_SQL, filmId);
-    }
-
-    @Override
     public void removeLike(int filmId, int userId) {
         filmLikesDao.removeLikeFromFilm(filmId, userId);
     }
 
     @Override
-    public Film getFilmById(Integer id) {
-        return jdbcTemplate.query(GET_FILM_BY_ID_SQL, (rs, rowNum) -> buildFilm(rs), id)
-                .stream().findFirst().orElseThrow(() -> {
-                    throw new FilmNotFoundException("Film with id " + id + " not found");
-                });
+    public Film getFilmById(Integer filmId) {
+        if (checkFilmExist(filmId)) {
+            Film film = jdbcTemplate.queryForObject(GET_FILM_BY_ID_SQL, (rs, rowNum) -> buildFilm(rs), filmId);
+            return film;
+        } else {
+            throw new FilmNotFoundException("Film with id=" + filmId + " not found");
+        }
     }
 
     @Override
@@ -154,8 +148,8 @@ public class DbFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Genre getGenreById(Integer id) {
-        return genreDao.getGenreById(id);
+    public Genre getGenreById(Integer genreId) {
+        return genreDao.getGenreById(genreId);
     }
 
     @Override
@@ -164,8 +158,8 @@ public class DbFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Rating getRatingById(Integer id) {
-        return ratingDao.getRatingById(id);
+    public Rating getRatingById(Integer ratingId) {
+        return ratingDao.getRatingById(ratingId);
     }
 
     @Override
@@ -204,4 +198,14 @@ public class DbFilmStorage implements FilmStorage {
         result.setGenres(genres);
         return result;
     }
+
+    private Boolean checkFilmExist(Integer filmId) {
+        Integer count = jdbcTemplate.queryForObject(CHECK_EXIST_FILM_SQL, Integer.class, filmId);
+        if (count > 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
 }

@@ -21,7 +21,7 @@ public class RatingController {
         this.filmService = filmService;
     }
 
-    @GetMapping()
+    @GetMapping
     public List<Rating> getAllRatings() {
         return filmService.getAllRatings();
     }

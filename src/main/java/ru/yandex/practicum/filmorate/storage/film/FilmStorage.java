@@ -14,17 +14,15 @@ public interface FilmStorage {
 
     Film updateFilm(Film film);
 
-    void deleteFilmById(Integer id);
-
-    Film getFilmById(Integer id);
+    Film getFilmById(Integer filmId);
 
     List<Genre> getAllGenres();
 
-    Genre getGenreById(Integer id);
+    Genre getGenreById(Integer genreId);
 
     List<Rating> getAllRatings();
 
-    Rating getRatingById(Integer id);
+    Rating getRatingById(Integer ratingId);
 
     List<Film> getMostPopularFilms(Integer count);
 

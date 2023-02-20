@@ -23,13 +23,13 @@ public class FilmController {
         this.filmService = filmService;
     }
 
-    @GetMapping()
+    @GetMapping
     public List<Film> getAllFilms() {
         log.info(stringToGreenColor("call method getAllFilms... via GET /films"));
         return filmService.getAllFilms();
     }
 
-    @PostMapping()
+    @PostMapping
     public Film createFilm(@Valid @RequestBody Film film) {
         log.info(stringToGreenColor("call method add film... via POST /film"));
         return filmService.createFilm(film);
@@ -40,12 +40,7 @@ public class FilmController {
         return filmService.getFilmById(id);
     }
 
-    @DeleteMapping("/{id}")
-    public void deleteFilm(@PathVariable Integer id) {
-        filmService.deleteFilmById(id);
-    }
-
-    @PutMapping()
+    @PutMapping
     public Film updateFilm(@Valid @RequestBody Film film) {
         log.info(stringToGreenColor("call method update film... via PUT /film"));
         return filmService.updateFilm(film);

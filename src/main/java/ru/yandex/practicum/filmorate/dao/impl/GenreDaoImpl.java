@@ -17,12 +17,13 @@ import java.util.Objects;
 
 @Component
 public class GenreDaoImpl implements GenreDao {
-    private final JdbcTemplate jdbcTemplate;
     private final static String GET_ALL_GENRES_SQL = "select * from genre";
     private final static String GET_GENRE_BY_ID_SQL = "select * from genre where genre_id = ?";
     private final static String GET_ALL_GENRE_NAMES_SQL = "select name from genre";
     private final static String GET_GENRE_ID_BY_NAME_SQL = "select genre_id from genre where name = ?";
     private final static String SET_NEW_GENRE_SQL = "insert into genre (name) values(?)";
+    private final static String CHECK_EXIST_GENRE_SQL = "select count(*) as cnt from genre where genre_id = ?";
+    private final JdbcTemplate jdbcTemplate;
 
     @Autowired
     public GenreDaoImpl(JdbcTemplate jdbcTemplate) {
@@ -41,18 +42,22 @@ public class GenreDaoImpl implements GenreDao {
 
     @Override
     public Genre getGenreById(Integer genreId) {
-        return jdbcTemplate.query(GET_GENRE_BY_ID_SQL, (rs, rowNum) -> buildGenre(rs), genreId)
-                .stream().findFirst().orElseThrow(() -> {
-                    throw new GenreNotFoundException("Genre not found");
-                });
+        if (checkGenreExist(genreId)) {
+            Genre genre = jdbcTemplate.queryForObject(GET_GENRE_BY_ID_SQL, (rs, rowNum) -> buildGenre(rs), genreId);
+            return genre;
+        } else {
+            throw new GenreNotFoundException("Genre with id=" + genreId + "not found");
+        }
     }
 
     @Override
     public Integer getGenreIdByGenreName(String name) {
-        return jdbcTemplate.query(GET_GENRE_ID_BY_NAME_SQL, (rs, rowNum) -> buildGenreId(rs), name)
-                .stream().findFirst().orElseThrow(() -> {
-                    throw new GenreNotFoundException("Genre not found");
-                });
+        Integer genreId = jdbcTemplate.queryForObject(GET_GENRE_ID_BY_NAME_SQL, (rs, rowNum) -> buildGenreId(rs), name);
+
+        if (genreId == null) {
+            throw new GenreNotFoundException("Genre with name=" + name + "not found");
+        } else
+            return genreId;
     }
 
     @Override
@@ -79,6 +84,15 @@ public class GenreDaoImpl implements GenreDao {
 
     private Integer buildGenreId(ResultSet rs) throws SQLException {
         return rs.getInt("genre_id");
+    }
+
+    private Boolean checkGenreExist(Integer genreId) {
+        Integer count = jdbcTemplate.queryForObject(CHECK_EXIST_GENRE_SQL, Integer.class, genreId);
+        if (count > 0) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
 }
