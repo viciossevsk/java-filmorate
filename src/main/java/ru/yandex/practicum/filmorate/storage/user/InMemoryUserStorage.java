@@ -71,6 +71,11 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
+    public void deleteUser(Integer userId) {
+        users.remove(userId);
+    }
+
+    @Override
     public User getUserById(Integer id) {
         if (id != null) {
             if (users.containsKey(id)) {

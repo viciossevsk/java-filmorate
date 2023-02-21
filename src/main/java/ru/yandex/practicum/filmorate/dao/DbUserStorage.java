@@ -81,6 +81,7 @@ public class DbUserStorage implements UserStorage {
     @Override
     public User updateUser(User user) throws UserException {
         log.info(stringToGreenColor("call method update user... in DbUserStorage"));
+        if (checkUserExist(user.getId())) {
         jdbcTemplate.update(UPDATE_USER_SQL
                 , user.getEmail()
                 , user.getLogin()
@@ -96,8 +97,16 @@ public class DbUserStorage implements UserStorage {
                         jdbcTemplate.update(SET_NEW_FRIENDSHIP_SQL, user.getId(), friend);
                     });
         }
-        log.info("The following user was successfully updated: {}", user);
+        log.info("The user was successfully updated: {}", user);
         return user;
+        } else {
+            throw new UserNotFoundException("User with id=" + user.getId() + " not found");
+        }
+    }
+
+    @Override
+    public void deleteUser(Integer userId) {
+        jdbcTemplate.update(DELETE_USER_SQL, userId);
     }
 
     @Override

@@ -13,7 +13,7 @@ public interface FilmStorage {
     Film createFilm(Film film);
 
     Film updateFilm(Film film);
-
+    void deleteFilmById(Integer filmId);
     Film getFilmById(Integer filmId);
 
     List<Genre> getAllGenres();
