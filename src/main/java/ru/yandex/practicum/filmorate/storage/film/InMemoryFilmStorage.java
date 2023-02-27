@@ -2,15 +2,14 @@ package ru.yandex.practicum.filmorate.storage.film;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.exception.FilmException;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.exception.*;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.Rating;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static ru.yandex.practicum.filmorate.otherFunction.AddvansedFunctions.stringToBlueColor;
 import static ru.yandex.practicum.filmorate.otherFunction.AddvansedFunctions.stringToGreenColor;
@@ -18,12 +17,54 @@ import static ru.yandex.practicum.filmorate.otherFunction.AddvansedFunctions.str
 @Slf4j
 @Component
 public class InMemoryFilmStorage implements FilmStorage {
-
+    private final Map<Integer, Genre> genres = new HashMap<>();
+    private final Map<Integer, Rating> ratings = new HashMap<>();
     private final Map<Integer, Film> films = new HashMap<>();
     private int generatorId;
 
+
+    public InMemoryFilmStorage() {
+        initiateGenres();
+        initiateRatings();
+    }
+
     @Override
-    public Film getFilm(Integer id) {
+    public void deleteFilmById(Integer filmId) {
+        log.info(stringToGreenColor("delete film... via DELETE /film"));
+        Film film = getFilmById(filmId);
+        films.remove(film.getId());
+    }
+
+    @Override
+    public void removeLike(int filmId, int userId) {
+        this.getFilmById(filmId).removeLike(userId);
+    }
+
+    @Override
+    public void addLikeToFilm(int filmId, int userId) {
+        this.getFilmById(filmId).addLike(userId);
+    }
+
+    private void initiateGenres() {
+        genres.put(1, Genre.builder().id(1).name("Комедия").build());
+        genres.put(2, Genre.builder().id(2).name("Драма").build());
+        genres.put(3, Genre.builder().id(3).name("Мультфильм").build());
+        genres.put(4, Genre.builder().id(4).name("Триллер").build());
+        genres.put(5, Genre.builder().id(5).name("Документальный").build());
+        genres.put(6, Genre.builder().id(6).name("Боевик").build());
+    }
+
+    private void initiateRatings() {
+        ratings.put(1, Rating.builder().id(1).name("G").build());
+        ratings.put(2, Rating.builder().id(2).name("PG").build());
+        ratings.put(3, Rating.builder().id(3).name("PG-13").build());
+        ratings.put(4, Rating.builder().id(4).name("R").build());
+        ratings.put(5, Rating.builder().id(5).name("NC-17").build());
+    }
+
+
+    @Override
+    public Film getFilmById(Integer id) {
         if (id != null) {
             if (films.containsKey(id)) {
                 return films.get(id);
@@ -31,8 +72,32 @@ public class InMemoryFilmStorage implements FilmStorage {
                 throw new FilmException("film id is empty");
             }
         } else {
-            throw new FilmException("film id=" + id + " not found");
+            throw new FilmNotFoundException("film id=" + id + " not found");
         }
+    }
+
+    @Override
+    public List<Film> getMostPopularFilms(Integer count) {
+        log.info(stringToGreenColor("getAllFilms... "));
+        return getAllFilms().stream().sorted(Comparator.comparing(film -> film.getLikes().size() * -1)).limit(count).collect(Collectors.toList());
+    }
+
+    @Override
+    public Genre getGenreById(Integer id) {
+        if (id != null) {
+            if (genres.containsKey(id)) {
+                return genres.get(id);
+            } else {
+                throw new GenreException("Genre id is empty");
+            }
+        } else {
+            throw new GenreNotFoundException("Genre id=" + id + " not found");
+        }
+    }
+
+    @Override
+    public List<Genre> getAllGenres() {
+        return new ArrayList<>(genres.values());
     }
 
     @Override
@@ -62,7 +127,7 @@ public class InMemoryFilmStorage implements FilmStorage {
                 throw new FilmException("film id invalid");
             }
         } else {
-            throw new FilmException("film id not found");
+            throw new FilmNotFoundException("film id not found");
         }
         return film;
     }
@@ -82,11 +147,21 @@ public class InMemoryFilmStorage implements FilmStorage {
             throw new ValidationException("film duration < 0");
         }
     }
+    @Override
+    public List<Rating> getAllRatings() {
+        return new ArrayList<>(ratings.values());
+    }
 
     @Override
-    public void deleteFilm(Integer id) {
-        log.info(stringToGreenColor("delete film... via DELETE /film"));
-        Film film = getFilm(id);
-        films.remove(film.getId());
+    public Rating getRatingById(Integer id) {
+        if (id != null) {
+            if (ratings.containsKey(id)) {
+                return ratings.get(id);
+            } else {
+                throw new RatingException("Rating id is empty");
+            }
+        } else {
+            throw new RatingNotFoundException("Rating id=" + id + " not found");
+        }
     }
 }

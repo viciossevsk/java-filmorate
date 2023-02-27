@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
+import javax.validation.Valid;
 import java.util.List;
 
 import static ru.yandex.practicum.filmorate.otherFunction.AddvansedFunctions.stringToGreenColor;
@@ -22,30 +23,25 @@ public class FilmController {
         this.filmService = filmService;
     }
 
-    @GetMapping()
+    @GetMapping
     public List<Film> getAllFilms() {
         log.info(stringToGreenColor("call method getAllFilms... via GET /films"));
         return filmService.getAllFilms();
     }
 
-    @PostMapping()
-    public Film createFilm(@RequestBody Film film) {
+    @PostMapping
+    public Film createFilm(@Valid @RequestBody Film film) {
         log.info(stringToGreenColor("call method add film... via POST /film"));
         return filmService.createFilm(film);
     }
 
     @GetMapping("/{id}")
     public Film getFilm(@PathVariable Integer id) {
-        return filmService.getFilm(id);
+        return filmService.getFilmById(id);
     }
 
-    @DeleteMapping("/{id}")
-    public void deleteFilm(@PathVariable Integer id) {
-        filmService.deleteFilm(id);
-    }
-
-    @PutMapping()
-    public Film updateFilm(@RequestBody Film film) {
+    @PutMapping
+    public Film updateFilm(@Valid @RequestBody Film film) {
         log.info(stringToGreenColor("call method update film... via PUT /film"));
         return filmService.updateFilm(film);
     }
@@ -57,9 +53,9 @@ public class FilmController {
      * @param userId - ИД юзера
      */
     @PutMapping("/{id}/like/{userId}")
-    public void addLikeToFilm(@PathVariable Integer id, @PathVariable Integer userId) {
+    public void addLikeToFilm(@PathVariable("id") Integer filmId, @PathVariable Integer userId) {
         log.info(stringToGreenColor("call method add like film... via PUT /films"));
-        filmService.addLikeToFilm(id, userId);
+        filmService.addLikeToFilm(filmId, userId);
     }
 
     /**
@@ -69,9 +65,9 @@ public class FilmController {
      * @param userId - ИД юзера
      */
     @DeleteMapping("/{id}/like/{userId}")
-    public void removeLikeFromFilm(@PathVariable Integer id, @PathVariable Integer userId) {
+    public void removeLikeFromFilm(@PathVariable("id") Integer filmId, @PathVariable Integer userId) {
         log.info(stringToGreenColor("call remove like from film... via DELETE /films"));
-        filmService.removeLikeFromFilm(id, userId);
+        filmService.removeLikeFromFilm(filmId, userId);
     }
 
     /**
