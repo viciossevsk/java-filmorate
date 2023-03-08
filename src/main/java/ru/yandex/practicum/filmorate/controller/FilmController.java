@@ -10,6 +10,7 @@ import javax.validation.Valid;
 import java.util.List;
 
 import static ru.yandex.practicum.filmorate.otherFunction.AddvansedFunctions.stringToGreenColor;
+import static ru.yandex.practicum.filmorate.otherFunction.AddvansedFunctions.stringToRedColor;
 
 @RestController
 @Slf4j
@@ -25,19 +26,23 @@ public class FilmController {
 
     @GetMapping
     public List<Film> getAllFilms() {
-        log.info(stringToGreenColor("call method getAllFilms... via GET /films"));
         return filmService.getAllFilms();
     }
 
     @PostMapping
     public Film createFilm(@Valid @RequestBody Film film) {
-        log.info(stringToGreenColor("call method add film... via POST /film"));
         return filmService.createFilm(film);
     }
 
     @GetMapping("/{id}")
-    public Film getFilm(@PathVariable Integer id) {
-        return filmService.getFilmById(id);
+    public Film getFilm(@PathVariable("id") Integer filmId) {
+        return filmService.getFilmById(filmId);
+    }
+
+    @GetMapping("/director/{id}")
+    public List<Film> getFilmsDirectorsSortBy(@PathVariable("id") Integer directorId,
+                                              @RequestParam(defaultValue = "name", required = false) String sortBy) {
+        return filmService.getFilmsDirectorsSortBy(directorId, sortBy);
     }
 
     @PutMapping
@@ -49,19 +54,18 @@ public class FilmController {
     /**
      * пользователь ставит лайк фильму
      *
-     * @param id     фильма
+     * @param filmId     фильма
      * @param userId - ИД юзера
      */
     @PutMapping("/{id}/like/{userId}")
     public void addLikeToFilm(@PathVariable("id") Integer filmId, @PathVariable Integer userId) {
-        log.info(stringToGreenColor("call method add like film... via PUT /films"));
         filmService.addLikeToFilm(filmId, userId);
     }
 
     /**
      * пользователь удаляет лайк.
      *
-     * @param id     фильма
+     * @param filmId     фильма
      * @param userId - ИД юзера
      */
     @DeleteMapping("/{id}/like/{userId}")
@@ -74,13 +78,28 @@ public class FilmController {
      * возвращает список из первых count фильмов по количеству лайков
      *
      * @param count - количество фильмов
+     * @param genreId - фильтр по жанру фильма
+     * @param year - фильтр по году выпуска фильма
      * @return Если значение параметра count не задано, верните первые 10
      */
     @GetMapping("/popular")
-    public List<Film> getMostPopularFilms(@RequestParam(defaultValue = "10", required = false) Integer count) {
-        log.info(stringToGreenColor("call method getAllFilms... via GET /films"));
-        return filmService.getMostPopularFilms(count);
+    public List<Film> getMostPopularFilmsWithGenreYear(@RequestParam(defaultValue = "10", required = false) Integer count,
+                                                       @RequestParam(required = false) Integer genreId,
+                                                       @RequestParam(required = false) Integer year) {
+        log.info(stringToGreenColor("call method getMostPopularFilms... via GET /films"));
+        return filmService.getMostPopularFilms(count, genreId, year);
     }
 
+    @DeleteMapping("{filmId}")
+    public void deleteFilmById(@PathVariable("filmId") Integer filmId) {
+        log.info(stringToRedColor("call remove film by filmId... via DELETE /films"));
+        filmService.deleteFilmById(filmId);
+    }
 
+    @GetMapping("/common")
+    public List<Film> getCommonFilms(@RequestParam Integer userId,
+                                     @RequestParam Integer friendId) {
+        log.info(stringToGreenColor("call method getCommonFilms... via GET /films"));
+        return filmService.getCommonFilms(userId, friendId);
+    }
 }
