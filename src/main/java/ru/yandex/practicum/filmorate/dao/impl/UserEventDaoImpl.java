@@ -41,8 +41,8 @@ public class UserEventDaoImpl implements UserEventDao {
                 .userId(rs.getInt("USERS_ID"))
                 .eventType(rs.getString("EVENT_TYPE"))
                 .operationType(rs.getString("OPERATION_TYPE"))
-                .entityId(rs.getInt("ENTITY_ID"))
                 .id(rs.getInt("USER_EVENT_ID"))
+                .entityId(rs.getInt("ENTITY_ID"))
                 .build();
     }
 

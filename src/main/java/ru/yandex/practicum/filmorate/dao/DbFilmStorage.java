@@ -22,8 +22,6 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.*;
 
-import static ru.yandex.practicum.filmorate.otherFunction.AddvansedFunctions.stringToGreenColor;
-
 @Component
 @Primary
 @Slf4j
@@ -323,7 +321,6 @@ public class DbFilmStorage implements FilmStorage {
     @Override
     public void addLikeToFilm(int filmId, int userId) {
         filmLikesDao.addLikeToFilm(filmId, userId);
-        log.info(stringToGreenColor("The user={} add like to film={}"), userId, filmId);
     }
 
     private Film buildFilm(ResultSet rs) throws SQLException {

@@ -9,8 +9,6 @@ import ru.yandex.practicum.filmorate.service.ReviewService;
 import javax.validation.Valid;
 import java.util.Collection;
 
-import static ru.yandex.practicum.filmorate.otherFunction.AddvansedFunctions.stringToGreenColor;
-
 @RestController
 @RequiredArgsConstructor
 @Slf4j
@@ -26,7 +24,6 @@ public class ReviewsController {
 
     @PutMapping()
     public Review updateReview(@Valid @RequestBody Review review) {
-        log.info(stringToGreenColor("апдейтим ревью={}"), review);
         return reviewService.updateReview(review);
     }
 

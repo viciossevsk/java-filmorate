@@ -76,7 +76,7 @@ public class ReviewDaoImpl implements ReviewDao {
             }, keyHolder);
             int reviewId = Objects.requireNonNull(keyHolder.getKey()).intValue();
             review.setId(reviewId);
-            log.info(stringToGreenColor("The review was successfully ADDED: {}"), review);
+            log.info(stringToGreenColor("---The review was successfully ADDED: {}"), review);
             userEventDao.setUserEvent(review.getUserId(), EventType.REVIEW, OperationType.ADD, reviewId);
             return review;
         } else if (review.getUserId() == null) {
@@ -95,6 +95,7 @@ public class ReviewDaoImpl implements ReviewDao {
     public Review updateReview(Review review) {
         jdbcTemplate.update(UPDATE_REVIEW_BY_ID_SQL, review.getIsPositive(), review.getContent(), review.getId());
         Review change_review = getReviewById(review.getId());
+        log.info(stringToGreenColor("---The review was successfully UPDATED: {}"), change_review);
         userEventDao.setUserEvent(change_review.getUserId(), EventType.REVIEW, OperationType.UPDATE,
                                   change_review.getId());
         return change_review;
@@ -105,6 +106,7 @@ public class ReviewDaoImpl implements ReviewDao {
         if (checkReviewExist(reviewId)) {
             Review review = getReviewById(reviewId);
             jdbcTemplate.update(DELETE_REVIEW_BY_ID_SQL, reviewId);
+            log.info(stringToGreenColor("---The review was successfully DELETED: {}"), review);
             userEventDao.setUserEvent(review.getUserId(), EventType.REVIEW, OperationType.REMOVE, review.getId());
         }
     }

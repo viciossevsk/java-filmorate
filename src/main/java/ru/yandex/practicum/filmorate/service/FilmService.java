@@ -46,13 +46,11 @@ public class FilmService {
     }
 
     public Film updateFilm(Film film) {
-        log.info(stringToGreenColor("call method update film in FilmStorage... via PUT /film"));
         validateFilm(film);
         return filmStorage.updateFilm(film);
     }
    
     public void addLikeToFilm(Integer filmId, Integer userId) {
-        log.info(stringToGreenColor("add like film..."));
         Film filmExist = filmStorage.getFilmById(filmId);
         User userExist = userStorage.getUserById(userId);
         filmStorage.addLikeToFilm(filmId, userId);
@@ -63,7 +61,6 @@ public class FilmService {
     }
 
     public void removeLikeFromFilm(Integer filmId, Integer userId) {
-        log.info(stringToGreenColor("remove like from film..."));
         Film filmExist = filmStorage.getFilmById(filmId);
         User userExist = userStorage.getUserById(userId);
         filmStorage.removeLike(filmId, userId);
@@ -116,15 +113,12 @@ public class FilmService {
             case "title,director":
             case "director,title":
                 filmList = filmStorage.searchByTitleDirector(element);
-                log.info("Результат поиска фильмов по названию и режиссеру " + filmList.size());
                 return filmList;
             case "director":
                 filmList = filmStorage.searchFilmByDirector(element);
-                log.info("Результат поиска фильмов по режиссеру " + filmList.size());
                 return filmList;
             case "title":
                 filmList = filmStorage.searchFilmByTitle(element);
-                log.info("Результат поиска фильмов по названию " + filmList.size());
                 return filmList;
             default:
                 return filmStorage.getAllFilms();

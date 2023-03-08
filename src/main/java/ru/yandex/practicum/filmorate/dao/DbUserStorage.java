@@ -111,6 +111,7 @@ public class DbUserStorage implements UserStorage {
     @Override
     public void deleteFriend(int userId, int friendId) {
         jdbcTemplate.update(DELETE_FRIENDSHIP_SQL, userId, friendId);
+        log.info(stringToGreenColor("---User={} friendship REMOVE to user={}"), userId, friendId);
         userEventDao.setUserEvent(userId, EventType.FRIEND, OperationType.REMOVE, friendId);
     }
 
@@ -118,7 +119,7 @@ public class DbUserStorage implements UserStorage {
     public void addFriend(int userId, int friendId) {
         if ((checkUserExist(userId)) && (checkUserExist(friendId))) {
             jdbcTemplate.update(SET_NEW_FRIENDSHIP_SQL, userId, friendId);
-            log.info(stringToGreenColor("User={} friendship to user={}"), userId, friendId);
+            log.info(stringToGreenColor("---User={} friendship to user={}"), userId, friendId);
             userEventDao.setUserEvent(userId, EventType.FRIEND, OperationType.ADD, friendId);
         } else {
             throw new UserNotFoundException("User with id=" + userId + " or friend with id=" + friendId + " not found" +

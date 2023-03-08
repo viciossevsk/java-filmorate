@@ -10,7 +10,6 @@ import javax.validation.Valid;
 import java.util.List;
 
 import static ru.yandex.practicum.filmorate.otherFunction.AddvansedFunctions.stringToGreenColor;
-import static ru.yandex.practicum.filmorate.otherFunction.AddvansedFunctions.stringToRedColor;
 
 @RestController
 @Slf4j
@@ -70,7 +69,6 @@ public class FilmController {
      */
     @DeleteMapping("/{id}/like/{userId}")
     public void removeLikeFromFilm(@PathVariable("id") Integer filmId, @PathVariable Integer userId) {
-        log.info(stringToGreenColor("call remove like from film... via DELETE /films"));
         filmService.removeLikeFromFilm(filmId, userId);
     }
 
@@ -86,20 +84,17 @@ public class FilmController {
     public List<Film> getMostPopularFilmsWithGenreYear(@RequestParam(defaultValue = "10", required = false) Integer count,
                                                        @RequestParam(required = false) Integer genreId,
                                                        @RequestParam(required = false) Integer year) {
-        log.info(stringToGreenColor("call method getMostPopularFilms... via GET /films"));
         return filmService.getMostPopularFilms(count, genreId, year);
     }
 
     @DeleteMapping("{filmId}")
     public void deleteFilmById(@PathVariable("filmId") Integer filmId) {
-        log.info(stringToRedColor("call remove film by filmId... via DELETE /films"));
         filmService.deleteFilmById(filmId);
     }
 
     @GetMapping("/common")
     public List<Film> getCommonFilms(@RequestParam Integer userId,
                                      @RequestParam Integer friendId) {
-        log.info(stringToGreenColor("call method getCommonFilms... via GET /films"));
         return filmService.getCommonFilms(userId, friendId);
     }
 
