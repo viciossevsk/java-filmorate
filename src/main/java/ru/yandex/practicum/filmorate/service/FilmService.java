@@ -81,7 +81,6 @@ public class FilmService {
      * сортируем DESC
      */
     public List<Film> getMostPopularFilms(Integer count, Integer genreId, Integer year) {
-        log.info(stringToGreenColor("getMostPopularFilms... "));
         return filmStorage.getMostPopularFilms(count, genreId, year);
     }
 

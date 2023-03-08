@@ -50,20 +50,6 @@ public class DbFilmStorage implements FilmStorage {
             "from film f " +
             "inner join rating r using(rating_id) " +
             "left join film_likes fl using(film_id) " +
-            "group by f.film_id " +
-            "order by count(distinct fl.users_id) DESC " +
-            "limit ?";
-
-    private final static String GET_POPULAR_FILMS_SQL2 = "select f.film_id, " +
-            "f.name, " +
-            "f.description, " +
-            "f.release_date, " +
-            "f.duration, " +
-            "r.rating_id as rating_id, " +
-            "r.name as rating_name " +
-            "from film f " +
-            "inner join rating r using(rating_id) " +
-            "left join film_likes fl using(film_id) " +
             "left join GENRE_FILM gf using(film_id) " +
             "WHERE (? is NULL OR gf.GENRE_ID = ?) " +
             "AND (? is NULL OR EXTRACT(year FROM f.release_date) = ?) " +
@@ -325,7 +311,7 @@ public class DbFilmStorage implements FilmStorage {
 
     @Override
     public List<Film> getMostPopularFilms(Integer count, Integer genreId, Integer year) {
-        return jdbcTemplate.query(GET_POPULAR_FILMS_SQL2, (rs, rowNum) -> buildFilm(rs), genreId, genreId, year, year
+        return jdbcTemplate.query(GET_POPULAR_FILMS_SQL, (rs, rowNum) -> buildFilm(rs), genreId, genreId, year, year
                 , count);
     }
 

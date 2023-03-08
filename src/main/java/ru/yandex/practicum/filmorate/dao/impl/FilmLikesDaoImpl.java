@@ -32,7 +32,7 @@ public class FilmLikesDaoImpl implements FilmLikesDao {
 
     @Override
     public void addLikeToFilm(Integer filmId, Integer userId) {
-        if (checkUserLikeExist(userId, filmId)) {
+        if (!checkUserLikeExist(userId, filmId)) {
             jdbcTemplate.update(SET_NEW_LIKE_TO_FILM_SQL, filmId, userId);
             log.info(stringToGreenColor("record event user log... user id={} set like to film id={}"), userId, filmId);
             userEventDao.setUserEvent(userId, EventType.LIKE, OperationType.ADD, filmId);
