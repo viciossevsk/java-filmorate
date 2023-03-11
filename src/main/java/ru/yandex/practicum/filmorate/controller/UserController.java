@@ -28,7 +28,6 @@ public class UserController {
      */
     @GetMapping
     public List<User> getAllUsers() {
-        //   log.info(stringToGreenColor("call method getAllUsers... via GET /users"));
         return userService.getAllUsers();
     }
 
@@ -41,10 +40,6 @@ public class UserController {
     public User updateUser(@Valid @RequestBody User user) {
         return userService.updateUser(user);
     }
-
-    /***
-     * получаем юзера по ИД
-     */
     @GetMapping("/{id}")
     public User getUser(@PathVariable Integer id) {
         return userService.getUser(id);
@@ -52,9 +47,9 @@ public class UserController {
 
     /**
      * добавление в друзья.
-     *
-     * @param id       - к кому добавляем
-     * @param friendId - кого добавляем
+     * <p>
+     * id - к кому добавляем
+     * friendId - кого добавляем
      */
     @PutMapping(value = "/{id}/friends/{friendId}")
     public void addFriend(@PathVariable Integer id, @PathVariable Integer friendId) throws SQLException {
@@ -64,8 +59,8 @@ public class UserController {
     /**
      * удалить из друзей.
      *
-     * @param id       - у кого удаляем друга
-     * @param friendId - кого удаляем
+     * id - у кого удаляем друга
+     * friendId - кого удаляем
      */
     @DeleteMapping(value = "/{id}/friends/{friendId}")
     public void deleteFriend(@PathVariable Integer id, @PathVariable Integer friendId) {

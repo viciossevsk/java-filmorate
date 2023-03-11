@@ -11,7 +11,6 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static ru.yandex.practicum.filmorate.otherFunction.AddvansedFunctions.stringToBlueColor;
 import static ru.yandex.practicum.filmorate.otherFunction.AddvansedFunctions.stringToGreenColor;
 
 @Slf4j
@@ -19,7 +18,6 @@ import static ru.yandex.practicum.filmorate.otherFunction.AddvansedFunctions.str
 public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public List<Film> getMostPopularFilms(Integer count, Integer genreId, Integer year) {
-        log.info(stringToGreenColor("getMostPopularFilms... "));
         return getAllFilms().stream().sorted(Comparator.comparing(film -> film.getLikes().size() * -1)).limit(count).collect(Collectors.toList());
     }
 
@@ -41,7 +39,6 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public void deleteFilmById(Integer filmId) {
-        log.info(stringToGreenColor("delete film... via DELETE /film"));
         Film film = getFilmById(filmId);
         films.remove(film.getId());
     }
@@ -112,7 +109,6 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public List<Film> getAllFilms() {
-        log.info(stringToGreenColor("getAllFilms... via GET /films"));
         return new ArrayList<>(films.values());
     }
 
@@ -121,14 +117,11 @@ public class InMemoryFilmStorage implements FilmStorage {
         validate(film);
         film.setId(++generatorId);
         films.put(film.getId(), film);
-        log.info(stringToGreenColor("add film... via POST /film"));
-        log.info(stringToBlueColor(film.toString()));
         return film;
     }
 
     @Override
     public Film updateFilm(Film film) {
-        log.info(stringToGreenColor("update film... via PUT /film"));
         validate(film);
         if (film.getId() != null) {
             if (films.containsKey(film.getId())) {
@@ -160,7 +153,6 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public List<Film> getFilmsDirectorsSortBy(Integer directorId, String sortBy) {
-        log.info(stringToGreenColor("getFilmsDirectorsSortBy... via GET /films"));
         return new ArrayList<>(films.values());
     }
 

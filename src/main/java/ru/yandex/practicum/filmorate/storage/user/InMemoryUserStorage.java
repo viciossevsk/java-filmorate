@@ -11,7 +11,6 @@ import ru.yandex.practicum.filmorate.model.UserEvent;
 import java.util.*;
 
 import static java.time.LocalDate.now;
-import static ru.yandex.practicum.filmorate.otherFunction.AddvansedFunctions.stringToGreenColor;
 
 @Slf4j
 @Component
@@ -26,12 +25,10 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     public List<User> getAllUsers() {
-        log.info(stringToGreenColor("getAllUsers..."));
         return new ArrayList<>(users.values());
     }
 
     public User createUser(User user) {
-        log.info(stringToGreenColor("add user..."));
         validate(user);
         user.setId(++generatorId);
         users.put(user.getId(), user);
@@ -40,7 +37,6 @@ public class InMemoryUserStorage implements UserStorage {
 
 
     public User updateUser(User user) {
-        log.info(stringToGreenColor("update user..."));
         validate(user);
         if (user.getId() != null) {
             if (users.containsKey(user.getId())) {
