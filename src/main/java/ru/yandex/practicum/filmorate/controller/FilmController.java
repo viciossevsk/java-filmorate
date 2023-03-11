@@ -60,7 +60,7 @@ public class FilmController {
 
     /**
      * пользователь удаляет лайк.
-     *
+     * <p>
      * id - фильма
      * userId - ИД юзера
      */
@@ -71,7 +71,7 @@ public class FilmController {
 
     /**
      * возвращает список из первых count фильмов по количеству лайков
-     *
+     * <p>
      * count - количество фильмов
      * genreId - фильтр по жанру фильма
      * year - фильтр по году выпуска фильма
@@ -96,9 +96,9 @@ public class FilmController {
     }
 
     @GetMapping("/search")
-    public List<Film> search(@RequestParam(value = "query", required = false) String query,
-                             @RequestParam(value = "by", required = false) String by) {
-        return filmService.searchFilms(query, by);//вызываем метод поиска
+    public List<Film> searchFilmsByQuery(@RequestParam(value = "query", required = false) String query,
+                                         @RequestParam(value = "by", required = false) String by) {
+        return filmService.searchFilmsByQuery(query, by);
     }
 
 }

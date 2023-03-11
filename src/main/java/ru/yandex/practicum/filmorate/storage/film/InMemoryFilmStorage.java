@@ -151,18 +151,19 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public List<Film> searchFilmByDirector(String director) {
-        return null;
+        return new ArrayList<>();
     }
 
     @Override
     public List<Film> searchFilmByTitle(String title) {
-        return null;
+        return new ArrayList<>();
     }
 
     @Override
-    public List<Film> searchByTitleDirector(String dirtit) {
-        return null;
+    public List<Film> searchFilmsByTitleDirector(String directorAndTitle) {
+        return new ArrayList<>();
     }
+
     @Override
     public List<Rating> getAllRatings() {
         return new ArrayList<>(ratings.values());

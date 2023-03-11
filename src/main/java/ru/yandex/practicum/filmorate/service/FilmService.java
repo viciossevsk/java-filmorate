@@ -22,6 +22,11 @@ public class FilmService {
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
 
+    private final static String DIRECTOR_AND_TITLE = "title,director";
+    private final static String TITLE_AND_DIRECTOR = "director,title";
+    private final static String DIRECTOR = "director";
+    private final static String TITLE = "title";
+
     public void deleteFilmById(int filmId) {
         filmStorage.deleteFilmById(filmId);
     }
@@ -103,23 +108,17 @@ public class FilmService {
         return filmStorage.getCommonFilms(userId, friendId);
     }
 
-    public List<Film> searchFilms(String query, String by) {
-        String element = query.toLowerCase();
-        List<Film> filmList;
+    public List<Film> searchFilmsByQuery(String query, String by) {
         switch (by) {
-            case "title,director":
-            case "director,title":
-                filmList = filmStorage.searchByTitleDirector(element);
-                return filmList;
-            case "director":
-                filmList = filmStorage.searchFilmByDirector(element);
-                return filmList;
-            case "title":
-                filmList = filmStorage.searchFilmByTitle(element);
-                return filmList;
+            case DIRECTOR_AND_TITLE:
+            case TITLE_AND_DIRECTOR:
+                return filmStorage.searchFilmsByTitleDirector(query);
+            case DIRECTOR:
+                return filmStorage.searchFilmByDirector(query);
+            case TITLE:
+                return filmStorage.searchFilmByTitle(query);
             default:
                 return filmStorage.getAllFilms();
         }
     }
 }
-

@@ -123,7 +123,7 @@ public class DbFilmStorage implements FilmStorage {
                     "LEFT JOIN FILM_LIKES AS L on F.FILM_ID = L.FILM_ID " +
                     "LEFT JOIN DIRECTOR_FILM AS DF ON F.FILM_ID = DF.FILM_ID " +
                     "LEFT JOIN DIRECTOR AS D ON D.DIRECTOR_ID = DF.DIRECTOR_ID " +
-                    "WHERE LOWER(D.NAME) LIKE ? " +
+                    "WHERE LOWER(D.NAME) LIKE LOWER(?) " +
                     "GROUP BY F.FILM_ID ORDER BY COUNT(L.USERS_ID) DESC";
 
     private final static String SEARCH_FILMS_BY_TITLE =
@@ -131,7 +131,7 @@ public class DbFilmStorage implements FilmStorage {
                     "FROM FILM AS F " +
                     "JOIN RATING AS R on F.RATING_ID = R.RATING_ID " +
                     "LEFT JOIN FILM_LIKES AS L on F.FILM_ID = L.FILM_ID " +
-                    "WHERE LOWER(F.NAME) LIKE ? " +
+                    "WHERE LOWER(F.NAME) LIKE LOWER(?) " +
                     "GROUP BY F.FILM_ID ORDER BY COUNT(L.USERS_ID) DESC ";
 
     private final static String SEARCH_FILMS_BY_TITLE_DIRECTOR =
@@ -141,7 +141,7 @@ public class DbFilmStorage implements FilmStorage {
                     "LEFT JOIN FILM_LIKES AS L on F.FILM_ID = L.FILM_ID " +
                     "LEFT JOIN DIRECTOR_FILM AS DF ON F.FILM_ID = DF.FILM_ID " +
                     "LEFT JOIN DIRECTOR AS D ON D.DIRECTOR_ID = DF.DIRECTOR_ID " +
-                    "WHERE LOWER(D.NAME) LIKE ? OR LOWER(F.NAME) LIKE ? " +
+                    "WHERE LOWER(D.NAME) LIKE LOWER(?) OR LOWER(F.NAME) LIKE LOWER(?) " +
                     "GROUP BY F.FILM_ID ORDER BY COUNT(L.USERS_ID) DESC";
 
     private final JdbcTemplate jdbcTemplate;
@@ -410,20 +410,18 @@ public class DbFilmStorage implements FilmStorage {
     }
 
     @Override
-    public List<Film> searchFilmByDirector(String director) {
-        String sqlQuery = SEARCH_FILMS_BY_DIRECTOR;
-        return jdbcTemplate.query(sqlQuery, (rs, rowNum) -> buildFilm(rs), "%" + director + "%");
+    public List<Film> searchFilmByDirector(String query) {
+        return jdbcTemplate.query(SEARCH_FILMS_BY_DIRECTOR, (rs, rowNum) -> buildFilm(rs), "%" + query + "%");
     }
 
     @Override
-    public List<Film> searchFilmByTitle(String title) {
-        String sqlQuery = SEARCH_FILMS_BY_TITLE;
-        return jdbcTemplate.query(sqlQuery, (rs, rowNum) -> buildFilm(rs), "%" + title + "%");
+    public List<Film> searchFilmByTitle(String query) {
+        return jdbcTemplate.query(SEARCH_FILMS_BY_TITLE, (rs, rowNum) -> buildFilm(rs), "%" + query + "%");
     }
 
     @Override
-    public List<Film> searchByTitleDirector(String dirtit) {
-        String sqlQuery = SEARCH_FILMS_BY_TITLE_DIRECTOR;
-        return jdbcTemplate.query(sqlQuery, (rs, rowNum) -> buildFilm(rs), "%" + dirtit + "%", "%" + dirtit + "%");
+    public List<Film> searchFilmsByTitleDirector(String query) {
+        return jdbcTemplate.query(SEARCH_FILMS_BY_TITLE_DIRECTOR, (rs, rowNum) -> buildFilm(rs), "%" + query + "%",
+                                  "%" + query + "%");
     }
 }

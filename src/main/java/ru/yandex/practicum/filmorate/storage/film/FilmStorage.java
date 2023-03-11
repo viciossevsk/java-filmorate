@@ -24,7 +24,6 @@ public interface FilmStorage {
 
     Rating getRatingById(Integer ratingId);
 
-    //  List<Film> getMostPopularFilms(Integer count);
     List<Film> getMostPopularFilms(Integer count, Integer genreId, Integer year);
 
     List<Film> getCommonFilms(Integer userId, Integer friendId);
@@ -39,11 +38,11 @@ public interface FilmStorage {
 
     List<Film> getFilmsDirectorsSortBy(Integer directorId, String sortBy);
 
-    List<Film> searchFilmByDirector(String director);
+    List<Film> searchFilmByDirector(String query);
 
-    List<Film> searchFilmByTitle(String title);
+    List<Film> searchFilmByTitle(String query);
 
-    List<Film> searchByTitleDirector(String dirtit);
+    List<Film> searchFilmsByTitleDirector(String query);
 
 }
 
