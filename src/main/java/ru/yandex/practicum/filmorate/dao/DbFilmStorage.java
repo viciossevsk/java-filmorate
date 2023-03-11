@@ -123,7 +123,7 @@ public class DbFilmStorage implements FilmStorage {
                     "LEFT JOIN FILM_LIKES AS L on F.FILM_ID = L.FILM_ID " +
                     "LEFT JOIN DIRECTOR_FILM AS DF ON F.FILM_ID = DF.FILM_ID " +
                     "LEFT JOIN DIRECTOR AS D ON D.DIRECTOR_ID = DF.DIRECTOR_ID " +
-                    "WHERE LOWER(D.NAME) LIKE LOWER(?) " +
+                    "WHERE LOWER(D.NAME) LIKE lower('%' || ? ||'%') " +
                     "GROUP BY F.FILM_ID ORDER BY COUNT(L.USERS_ID) DESC";
 
     private final static String SEARCH_FILMS_BY_TITLE =
@@ -131,18 +131,8 @@ public class DbFilmStorage implements FilmStorage {
                     "FROM FILM AS F " +
                     "JOIN RATING AS R on F.RATING_ID = R.RATING_ID " +
                     "LEFT JOIN FILM_LIKES AS L on F.FILM_ID = L.FILM_ID " +
-                    "WHERE LOWER(F.NAME) LIKE LOWER(?) " +
+                    "WHERE LOWER(F.NAME) LIKE lower('%' || ? ||'%') " +
                     "GROUP BY F.FILM_ID ORDER BY COUNT(L.USERS_ID) DESC ";
-
-//    private final static String SEARCH_FILMS_BY_TITLE_DIRECTOR =
-//            "SELECT F.*, R.NAME as rating_name, r.rating_id as rating_id, D.NAME as director_name " +
-//                    "FROM FILM AS F " +
-//                    "LEFT JOIN RATING AS R on F.RATING_ID = R.RATING_ID " +
-//                    "LEFT JOIN FILM_LIKES AS L on F.FILM_ID = L.FILM_ID " +
-//                    "LEFT JOIN DIRECTOR_FILM AS DF ON F.FILM_ID = DF.FILM_ID " +
-//                    "LEFT JOIN DIRECTOR AS D ON D.DIRECTOR_ID = DF.DIRECTOR_ID " +
-//                    "WHERE LOWER(D.NAME) LIKE lower('%' || ?||'%') OR LOWER(F.NAME) LIKE lower('%' || ?||'%') " +
-//                    "GROUP BY F.FILM_ID ORDER BY COUNT(L.USERS_ID) DESC";
 
     private final static String SEARCH_FILMS_BY_TITLE_DIRECTOR =
             "SELECT F.*, R.NAME as rating_name, r.rating_id as rating_id, D.NAME as director_name " +
@@ -151,9 +141,9 @@ public class DbFilmStorage implements FilmStorage {
                     "LEFT JOIN FILM_LIKES AS L on F.FILM_ID = L.FILM_ID " +
                     "LEFT JOIN DIRECTOR_FILM AS DF ON F.FILM_ID = DF.FILM_ID " +
                     "LEFT JOIN DIRECTOR AS D ON D.DIRECTOR_ID = DF.DIRECTOR_ID " +
-                    "WHERE (? is NULL OR LOWER(D.NAME) LIKE lower('%' || ?||'%')) " +
-                    "OR (? is NULL OR LOWER(F.NAME) LIKE lower('%' || ?||'%')) " +
+                    "WHERE LOWER(D.NAME) LIKE lower('%' || ? ||'%') OR LOWER(F.NAME) LIKE lower('%' || ? ||'%') " +
                     "GROUP BY F.FILM_ID ORDER BY COUNT(L.USERS_ID) DESC";
+
 
     private final JdbcTemplate jdbcTemplate;
     private final RatingDao ratingDao;
@@ -279,7 +269,7 @@ public class DbFilmStorage implements FilmStorage {
 
     @Override
     public void deleteFilmById(Integer filmId) {
-            jdbcTemplate.update(DELETE_FILM_SQL, filmId);
+        jdbcTemplate.update(DELETE_FILM_SQL, filmId);
     }
 
     @Override
@@ -432,7 +422,6 @@ public class DbFilmStorage implements FilmStorage {
 
     @Override
     public List<Film> searchFilmsByTitleDirector(String query) {
-        return jdbcTemplate.query(SEARCH_FILMS_BY_TITLE_DIRECTOR, (rs, rowNum) -> buildFilm(rs), query, query, query,
-                                  query);
+        return jdbcTemplate.query(SEARCH_FILMS_BY_TITLE_DIRECTOR, (rs, rowNum) -> buildFilm(rs), query, query);
     }
 }

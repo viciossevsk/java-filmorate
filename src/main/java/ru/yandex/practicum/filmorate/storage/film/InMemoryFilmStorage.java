@@ -160,7 +160,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public List<Film> searchFilmsByTitleDirector(String directorAndTitle) {
+    public List<Film> searchFilmsByTitleDirector(String query) {
         return new ArrayList<>();
     }
 
