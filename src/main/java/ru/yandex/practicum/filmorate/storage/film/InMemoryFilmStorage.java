@@ -11,21 +11,16 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static ru.yandex.practicum.filmorate.otherFunction.AddvansedFunctions.stringToBlueColor;
-import static ru.yandex.practicum.filmorate.otherFunction.AddvansedFunctions.stringToGreenColor;
-
 @Slf4j
 @Component
 public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public List<Film> getMostPopularFilms(Integer count, Integer genreId, Integer year) {
-        log.info(stringToGreenColor("getMostPopularFilms... "));
         return getAllFilms().stream().sorted(Comparator.comparing(film -> film.getLikes().size() * -1)).limit(count).collect(Collectors.toList());
     }
-
     @Override
     public List<Film> getCommonFilms(Integer userId, Integer friendId) {
-        return null;
+        return new ArrayList<>();
     }
 
     private final Map<Integer, Genre> genres = new HashMap<>();
@@ -33,19 +28,15 @@ public class InMemoryFilmStorage implements FilmStorage {
     private final Map<Integer, Film> films = new HashMap<>();
     private int generatorId;
 
-
     public InMemoryFilmStorage() {
         initiateGenres();
         initiateRatings();
     }
-
     @Override
     public void deleteFilmById(Integer filmId) {
-        log.info(stringToGreenColor("delete film... via DELETE /film"));
         Film film = getFilmById(filmId);
         films.remove(film.getId());
     }
-
     @Override
     public void removeLike(int filmId, int userId) {
         this.getFilmById(filmId).removeLike(userId);
@@ -112,7 +103,6 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public List<Film> getAllFilms() {
-        log.info(stringToGreenColor("getAllFilms... via GET /films"));
         return new ArrayList<>(films.values());
     }
 
@@ -121,14 +111,11 @@ public class InMemoryFilmStorage implements FilmStorage {
         validate(film);
         film.setId(++generatorId);
         films.put(film.getId(), film);
-        log.info(stringToGreenColor("add film... via POST /film"));
-        log.info(stringToBlueColor(film.toString()));
         return film;
     }
 
     @Override
     public Film updateFilm(Film film) {
-        log.info(stringToGreenColor("update film... via PUT /film"));
         validate(film);
         if (film.getId() != null) {
             if (films.containsKey(film.getId())) {
@@ -143,7 +130,6 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     public void validate(Film film) {
-        log.trace(stringToGreenColor("validate for film"));
         if (film.getName().isEmpty()) {
             throw new ValidationException("film name invalid");
         }
@@ -160,7 +146,6 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public List<Film> getFilmsDirectorsSortBy(Integer directorId, String sortBy) {
-        log.info(stringToGreenColor("getFilmsDirectorsSortBy... via GET /films"));
         return new ArrayList<>(films.values());
     }
 
@@ -178,7 +163,6 @@ public class InMemoryFilmStorage implements FilmStorage {
     public List<Film> searchByTitleDirector(String dirtit) {
         return null;
     }
-
     @Override
     public List<Rating> getAllRatings() {
         return new ArrayList<>(ratings.values());

@@ -15,8 +15,6 @@ import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
 
-import static ru.yandex.practicum.filmorate.otherFunction.AddvansedFunctions.stringToGreenColor;
-
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -33,7 +31,6 @@ public class FilmService {
     }
 
     public List<Film> getFilmsDirectorsSortBy(Integer directorId, String sortBy) {
-        log.info(stringToGreenColor("call method getFilmsDirectorsSortBy in FilmStorage... via GET /films"));
         return filmStorage.getFilmsDirectorsSortBy(directorId, sortBy);
     }
 
@@ -49,7 +46,7 @@ public class FilmService {
         validateFilm(film);
         return filmStorage.updateFilm(film);
     }
-   
+
     public void addLikeToFilm(Integer filmId, Integer userId) {
         Film filmExist = filmStorage.getFilmById(filmId);
         User userExist = userStorage.getUserById(userId);
@@ -124,5 +121,5 @@ public class FilmService {
                 return filmStorage.getAllFilms();
         }
     }
-
 }
+

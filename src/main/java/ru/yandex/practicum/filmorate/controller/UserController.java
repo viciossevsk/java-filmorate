@@ -23,12 +23,8 @@ public class UserController {
         this.userService = userService;
     }
 
-    /***
-     * показать всех юзеров
-     */
     @GetMapping
     public List<User> getAllUsers() {
-        //   log.info(stringToGreenColor("call method getAllUsers... via GET /users"));
         return userService.getAllUsers();
     }
 
@@ -42,31 +38,16 @@ public class UserController {
         return userService.updateUser(user);
     }
 
-    /***
-     * получаем юзера по ИД
-     */
     @GetMapping("/{id}")
     public User getUser(@PathVariable Integer id) {
         return userService.getUser(id);
     }
 
-    /**
-     * добавление в друзья.
-     *
-     * @param id       - к кому добавляем
-     * @param friendId - кого добавляем
-     */
     @PutMapping(value = "/{id}/friends/{friendId}")
     public void addFriend(@PathVariable Integer id, @PathVariable Integer friendId) throws SQLException {
         userService.addFriend(id, friendId);
     }
 
-    /**
-     * удалить из друзей.
-     *
-     * @param id       - у кого удаляем друга
-     * @param friendId - кого удаляем
-     */
     @DeleteMapping(value = "/{id}/friends/{friendId}")
     public void deleteFriend(@PathVariable Integer id, @PathVariable Integer friendId) {
         userService.deleteFriend(id, friendId);

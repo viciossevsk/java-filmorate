@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.dao;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -20,10 +21,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static ru.yandex.practicum.filmorate.otherFunction.AddvansedFunctions.stringToGreenColor;
 
@@ -80,27 +79,35 @@ public class DbUserStorage implements UserStorage {
 
     @Override
     public User updateUser(User user) throws UserException {
-        if (checkUserExist(user.getId())) {
-        jdbcTemplate.update(UPDATE_USER_SQL
-                , user.getEmail()
-                , user.getLogin()
-                , user.getName()
-                , Date.valueOf(user.getBirthday())
-                , user.getId());
+        Optional.ofNullable(jdbcTemplate.update(UPDATE_USER_SQL
+                        , user.getEmail()
+                        , user.getLogin()
+                        , user.getName()
+                        , Date.valueOf(user.getBirthday())
+                        , user.getId()))
+                .orElseThrow(() -> new UserNotFoundException("User with id=" + user.getId() + " not found"));
 
         jdbcTemplate.update(DELETE_FRIENDS_BY_USER_ID_SQL, user.getId());
 
         if (user.getFriends() != null) {
-            user.getFriends().stream()
-                    .forEach((friend) -> {
-                        jdbcTemplate.update(SET_NEW_FRIENDSHIP_SQL, user.getId(), friend);
-                    });
+            List<Integer> friendIds = user.getFriends().stream().collect(Collectors.toList());
+            jdbcTemplate.batchUpdate(SET_NEW_FRIENDSHIP_SQL, new BatchPreparedStatementSetter() {
+                @Override
+                public void setValues(PreparedStatement ps, int i) throws SQLException {
+                    Integer friendId = friendIds.get(i);
+                    ps.setString(1, String.valueOf(user.getId()));
+                    ps.setString(2, String.valueOf(friendId));
+                }
+
+                @Override
+                public int getBatchSize() {
+                    return friendIds.size();
+                }
+            });
         }
-            log.info(stringToGreenColor("The user was successfully UPDATED: {}"), user);
+        log.info(stringToGreenColor("The user was successfully UPDATED: {}"), user);
         return user;
-        } else {
-            throw new UserNotFoundException("User with id=" + user.getId() + " not found");
-        }
+
     }
 
     @Override
@@ -111,7 +118,6 @@ public class DbUserStorage implements UserStorage {
     @Override
     public void deleteFriend(int userId, int friendId) {
         jdbcTemplate.update(DELETE_FRIENDSHIP_SQL, userId, friendId);
-        log.info(stringToGreenColor("---User={} friendship REMOVE to user={}"), userId, friendId);
         userEventDao.setUserEvent(userId, EventType.FRIEND, OperationType.REMOVE, friendId);
     }
 
@@ -129,13 +135,10 @@ public class DbUserStorage implements UserStorage {
 
     @Override
     public User getUserById(Integer userId) throws UserException {
-        if (checkUserExist(userId)) {
-            User user = jdbcTemplate.queryForObject(GET_USER_BY_ID_SQL, (rs, rowNum) -> buildUser(rs), userId);
-            log.debug(stringToGreenColor("call method getUserById: {}"), user);
-            return user;
-        } else {
-            throw new UserNotFoundException("User with id=" + userId + " not found");
-        }
+        return jdbcTemplate.query(GET_USER_BY_ID_SQL, (rs, rowNum) -> buildUser(rs), userId)
+                .stream().findFirst().orElseThrow(() -> {
+                    throw new UserNotFoundException("User with id=" + userId + " not found");
+                });
     }
 
     @Override

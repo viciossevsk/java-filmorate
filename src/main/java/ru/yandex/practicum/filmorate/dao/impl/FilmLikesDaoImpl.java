@@ -14,8 +14,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static ru.yandex.practicum.filmorate.otherFunction.AddvansedFunctions.stringToGreenColor;
-
 @Component
 @Slf4j
 @Data
@@ -35,14 +33,12 @@ public class FilmLikesDaoImpl implements FilmLikesDao {
         if (!checkUserLikeExist(userId, filmId)) {
             jdbcTemplate.update(SET_NEW_LIKE_TO_FILM_SQL, filmId, userId);
         }
-        log.info(stringToGreenColor("---User id={} set like to film id={}"), userId, filmId);
         userEventDao.setUserEvent(userId, EventType.LIKE, OperationType.ADD, filmId);
     }
 
     @Override
     public void removeLikeFromFilm(Integer filmId, Integer userId) {
         jdbcTemplate.update(DELETE_LIKE_FROM_FILM_SQL, filmId, userId);
-        log.info(stringToGreenColor("---User id={} REMOVE like to film id={}"), userId, filmId);
         userEventDao.setUserEvent(userId, EventType.LIKE, OperationType.REMOVE, filmId);
     }
 

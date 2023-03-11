@@ -7,7 +7,7 @@ import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.service.ReviewService;
 
 import javax.validation.Valid;
-import java.util.Collection;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -18,8 +18,8 @@ public class ReviewsController {
     private final ReviewService reviewService;
 
     @PostMapping()
-    public Review addReview(@Valid @RequestBody Review review) {
-        return reviewService.addReview(review);
+    public Review createReview(@Valid @RequestBody Review review) {
+        return reviewService.createReview(review);
     }
 
     @PutMapping()
@@ -33,18 +33,18 @@ public class ReviewsController {
     }
 
     @GetMapping("/{id}")
-    public Review receiveReview(@PathVariable("id") Integer reviewId) {
+    public Review getReviewById(@PathVariable("id") Integer reviewId) {
         return reviewService.getReviewById(reviewId);
     }
 
     @GetMapping()
-    public Collection<Review> receiveFilmsReviews(
+    public List<Review> getReceiveFilmsReviews(
             @RequestParam(defaultValue = "10", required = false) Integer count,
             @RequestParam(defaultValue = "0", required = false) String filmId) {
         if (filmId.equals("0")) {
             return reviewService.receiveAllReview();
         }
-        return reviewService.receiveFilmsReviews(count, filmId);
+        return reviewService.getReceiveFilmsReviews(count, filmId);
     }
 
     @PutMapping("/{id}/like/{userId}")

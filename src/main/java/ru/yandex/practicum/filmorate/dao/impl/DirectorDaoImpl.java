@@ -38,19 +38,13 @@ public class DirectorDaoImpl implements DirectorDao {
 
     @Override
     public List<Director> getAllDirectors() {
-        log.info("call method getAllDirectors from DirectorDaoImpl");
         return jdbcTemplate.query(GET_ALL_DIRECTORS_SQL, (rs, rowNum) -> buildDirector(rs));
     }
 
     @Override
     public Director getDirectorById(Integer directorId) throws DirectorNotFoundException {
-        if (checkDirectorExist(directorId)) {
-            Director director = jdbcTemplate.queryForObject(GET_DIRECTOR_BY_ID_SQL, (rs, rowNum) -> buildDirector(rs)
-                    , directorId);
-            return director;
-        } else {
-            throw new DirectorNotFoundException("Director with id=" + directorId + "not found");
-        }
+        return jdbcTemplate.query(GET_DIRECTOR_BY_ID_SQL, (rs, rowNum) -> buildDirector(rs), directorId).stream().findFirst()
+                .orElseThrow(() -> new DirectorNotFoundException("Director with id=" + directorId + "not found"));
     }
 
     @Override
@@ -79,14 +73,10 @@ public class DirectorDaoImpl implements DirectorDao {
         return director;
     }
 
+
     @Override
     public void deleteDirector(Integer directorId) throws DirectorNotFoundException {
-        if (checkDirectorExist(directorId)) {
-            jdbcTemplate.update(DELETE_DIRECTOR_SQL
-                    , directorId);
-        } else {
-            throw new DirectorNotFoundException("Director with id=" + directorId + " not found");
-        }
+        jdbcTemplate.update(DELETE_DIRECTOR_SQL, directorId);
         log.info("The following director with id=" + directorId + " was successfully deleted");
     }
 
@@ -97,6 +87,7 @@ public class DirectorDaoImpl implements DirectorDao {
                 .build();
     }
 
+    @Override
     public Boolean checkDirectorExist(Integer directorId) {
         Integer count = jdbcTemplate.queryForObject(CHECK_EXIST_DIRECTOR_SQL, Integer.class, directorId);
         if (count > 0) {

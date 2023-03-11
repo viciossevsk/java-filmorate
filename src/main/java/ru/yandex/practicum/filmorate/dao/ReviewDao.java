@@ -2,11 +2,10 @@ package ru.yandex.practicum.filmorate.dao;
 
 import ru.yandex.practicum.filmorate.model.Review;
 
-import java.util.Collection;
 import java.util.List;
 
 public interface ReviewDao {
-    Review addReview(Review review);
+    Review createReview(Review review);
 
     Review getReviewById(Integer reviewId);
 
@@ -14,7 +13,7 @@ public interface ReviewDao {
 
     void removeReview(Integer reviewId);
 
-    Collection<Review> receiveFilmsReviews(Integer count, String filmId);
+    List<Review> getReceiveFilmsReviews(Integer count, String filmId);
 
     void likeReview(Integer reviewId, Integer userId);
 

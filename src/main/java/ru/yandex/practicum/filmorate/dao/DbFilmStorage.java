@@ -194,7 +194,6 @@ public class DbFilmStorage implements FilmStorage {
             film.setDirectors(new LinkedHashSet<>());
         }
         film.setId(filmId);
-        log.info("The following film was successfully added: {}", film);
         return film;
     }
 
@@ -269,22 +268,14 @@ public class DbFilmStorage implements FilmStorage {
 
     @Override
     public void deleteFilmById(Integer filmId) {
-        if (checkFilmExist(filmId)) {
-            Film film = jdbcTemplate.queryForObject(GET_FILM_BY_ID_SQL, (rs, rowNum) -> buildFilm(rs), filmId);
             jdbcTemplate.update(DELETE_FILM_SQL, filmId);
-        } else {
-            throw new FilmNotFoundException("Film with id=" + filmId + " not found");
-        }
     }
 
     @Override
     public Film getFilmById(Integer filmId) {
-        if (checkFilmExist(filmId)) {
-            Film film = jdbcTemplate.queryForObject(GET_FILM_BY_ID_SQL, (rs, rowNum) -> buildFilm(rs), filmId);
-            return film;
-        } else {
-            throw new FilmNotFoundException("Film with id=" + filmId + " not found");
-        }
+        return jdbcTemplate.query(GET_FILM_BY_ID_SQL, (rs, rowNum) -> buildFilm(rs), filmId)
+                .stream().findFirst().orElseThrow(() -> new FilmNotFoundException("Film with id=" + filmId + " not " +
+                                                                                          "found"));
     }
 
     @Override
@@ -367,9 +358,8 @@ public class DbFilmStorage implements FilmStorage {
         final List<Integer> userFilmsIDList = new ArrayList<>(getFilmsIDList(id));
         final String sqlQueryUsersID = "SELECT USERS_ID from USERS";
         final List<Integer> allUsersIDList = new ArrayList<>(jdbcTemplate.query(sqlQueryUsersID,
-                                                                                this::getIdForUserList)); // собираем
-        // строку с id всех Ю в лист
-        allUsersIDList.remove(id); // удаляем самого себя из общего листа
+                                                                                this::getIdForUserList));
+        allUsersIDList.remove(id);
 
         int crossListSize = 0;
 
@@ -401,9 +391,8 @@ public class DbFilmStorage implements FilmStorage {
         return rs.getInt("Users_ID");
     }
 
-    private List<Integer> getCrossListFilmsId(Integer userId, List<Integer> userFilmsIDList) { // получаем список
-        // айди с пересечениями
-        List<Integer> includeUserFilmsIDList = new ArrayList<>(userFilmsIDList); //
+    private List<Integer> getCrossListFilmsId(Integer userId, List<Integer> userFilmsIDList) {
+        List<Integer> includeUserFilmsIDList = new ArrayList<>(userFilmsIDList);
         final List<Integer> otherUserFilmsIDList = new ArrayList<>(getFilmsIDList(userId));
         includeUserFilmsIDList.retainAll(otherUserFilmsIDList);
         return includeUserFilmsIDList;
@@ -437,5 +426,4 @@ public class DbFilmStorage implements FilmStorage {
         String sqlQuery = SEARCH_FILMS_BY_TITLE_DIRECTOR;
         return jdbcTemplate.query(sqlQuery, (rs, rowNum) -> buildFilm(rs), "%" + dirtit + "%", "%" + dirtit + "%");
     }
-
 }

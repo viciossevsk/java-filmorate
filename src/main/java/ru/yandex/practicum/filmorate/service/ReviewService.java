@@ -5,7 +5,6 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dao.impl.ReviewDaoImpl;
 import ru.yandex.practicum.filmorate.model.Review;
 
-import java.util.Collection;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -14,8 +13,8 @@ public class ReviewService {
 
     private final ReviewDaoImpl reviewDao;
 
-    public Review addReview(Review review) {
-        return reviewDao.addReview(review);
+    public Review createReview(Review review) {
+        return reviewDao.createReview(review);
     }
 
     public Review updateReview(Review review) {
@@ -30,8 +29,8 @@ public class ReviewService {
         return reviewDao.getReviewById(reviewId);
     }
 
-    public Collection<Review> receiveFilmsReviews(Integer count, String filmId) {
-        return reviewDao.receiveFilmsReviews(count, filmId);
+    public List<Review> getReceiveFilmsReviews(Integer count, String filmId) {
+        return reviewDao.getReceiveFilmsReviews(count, filmId);
     }
 
     public void likeReview(Integer reviewId, Integer userId) {

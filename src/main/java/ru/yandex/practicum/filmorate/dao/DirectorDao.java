@@ -16,5 +16,5 @@ public interface DirectorDao {
 
     void deleteDirector(Integer directorId);
 
-    public Boolean checkDirectorExist(Integer directorId);
+    Boolean checkDirectorExist(Integer directorId);
 }

@@ -22,46 +22,45 @@ import ru.yandex.practicum.filmorate.otherFunction.OperationType;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-
-import static ru.yandex.practicum.filmorate.otherFunction.AddvansedFunctions.stringToGreenColor;
 
 @RequiredArgsConstructor
 @Component
 @Slf4j
 public class ReviewDaoImpl implements ReviewDao {
 
+    private final static String CHECK_EXIST_REVIEW_SQL = "select count(*) as cnt from REVIEW where REVIEW_ID = ?";
+    private final static String GET_REVIEW_BY_ID_SQL = "select * from REVIEW where REVIEW_ID = ?";
+    private final static String DELETE_REVIEW_BY_ID_SQL = "delete from review where review_id = ?";
+    private final static String UPDATE_REVIEW_BY_ID_SQL =
+            "UPDATE review " + "SET is_positive = ?, " + "content = ? " + "WHERE review_id = ?; ";
+    private final static String GET_RECEIVE_FILMS_REVIEW_BY_ID_SQL = "select * from review where film_id = ?";
+    private final static String GET_ALL_REVIEW_SQL = "select * from review";
+    private final static String SET_LIKE_OR_DISLIKE_REVIEW_SQL = "INSERT INTO review_like (" + "review_id, " +
+            "users_id, " + "like_or_dislike) " + "values" + "(?, ?, ?)";
+    private final static String GET_REVIEW_USEFUL_SQL = "SELECT SUM(like_or_dislike) AS summary " + "FROM REVIEW_LIKE" +
+            " WHERE review_id = ?";
+    private final static String DELETE_LIKE_OR_DISLIKE_REVIEW_SQL = "DELETE from review_like " + "WHERE review_id = ?" +
+            " AND users_id = ?";
     private final JdbcTemplate jdbcTemplate;
     private final DbUserStorage dbUserStorage;
     private final DbFilmStorage dbFilmStorage;
     private final UserEventDao userEventDao;
 
-    private final static String CHECK_EXIST_REVIEW_SQL = "select count(*) as cnt from REVIEW where REVIEW_ID = ?";
-    private final static String GET_REVIEW_BY_ID_SQL = "select * from REVIEW where REVIEW_ID = ?";
-    private final static String DELETE_REVIEW_BY_ID_SQL = "delete from review where review_id = ?";
-    private final static String UPDATE_REVIEW_BY_ID_SQL = "UPDATE review " +
-            "SET is_positive = ?, " +
-            "content = ? " +
-            "WHERE review_id = ?; ";
-    private final static String GET_RECEIVE_FILMS_REVIEW_BY_ID_SQL = "select * from review where film_id = ?";
-    private final static String GET_ALL_REVIEW_SQL = "select * from review";
-    private final static String SET_LIKE_OR_DISLIKE_REVIEW_SQL = "INSERT INTO review_like (" +
-            "review_id, " +
-            "users_id, " +
-            "like_or_dislike) " +
-            "values" +
-            "(?, ?, ?)";
-    private final static String GET_REVIEW_USEFUL_SQL = "SELECT SUM(like_or_dislike) AS summary " +
-            "FROM REVIEW_LIKE WHERE review_id = ?";
-    private final static String DELETE_LIKE_OR_DISLIKE_REVIEW_SQL = "DELETE from review_like " +
-            "WHERE review_id = ? AND users_id = ?";
-
     @Override
-    public Review addReview(Review review) {
+    public Review createReview(Review review) {
+        if (review.getUserId() == null) {
+            throw new ValidationException("User has to exist");
+        } else if (review.getFilmId() == null) {
+            throw new ValidationException("Film has to exist");
+        } else if (!dbUserStorage.checkUserExist(review.getUserId())) {
+            throw new UserNotFoundException("User with id=" + review.getUserId() + " not found");
+        } else if (!dbFilmStorage.checkFilmExist(review.getFilmId())) {
+            throw new FilmNotFoundException("Film with id=" + review.getFilmId() + " not found");
+        }
         if (dbFilmStorage.checkFilmExist(review.getFilmId()) && dbUserStorage.checkUserExist(review.getUserId())) {
             String sql = "INSERT INTO review (content, " + "        is_positive, " + "        users_id, " + "        "
                     + "film_id) values " + "(?, ?, ?, ?);";
@@ -76,29 +75,18 @@ public class ReviewDaoImpl implements ReviewDao {
             }, keyHolder);
             int reviewId = Objects.requireNonNull(keyHolder.getKey()).intValue();
             review.setId(reviewId);
-            log.info(stringToGreenColor("---The review was successfully ADDED: {}"), review);
             userEventDao.setUserEvent(review.getUserId(), EventType.REVIEW, OperationType.ADD, reviewId);
-            return review;
-        } else if (review.getUserId() == null) {
-            throw new ValidationException("User has to exist");
-        } else if (review.getFilmId() == null) {
-            throw new ValidationException("Film has to exist");
-        } else if (!dbUserStorage.checkUserExist(review.getUserId())) {
-            throw new UserNotFoundException("User with id=" + review.getUserId() + " not found");
-        } else if (!dbFilmStorage.checkFilmExist(review.getFilmId())) {
-            throw new FilmNotFoundException("Film with id=" + review.getFilmId() + " not found");
         }
-        return null;
+        return review;
     }
 
     @Override
     public Review updateReview(Review review) {
         jdbcTemplate.update(UPDATE_REVIEW_BY_ID_SQL, review.getIsPositive(), review.getContent(), review.getId());
-        Review change_review = getReviewById(review.getId());
-        log.info(stringToGreenColor("---The review was successfully UPDATED: {}"), change_review);
-        userEventDao.setUserEvent(change_review.getUserId(), EventType.REVIEW, OperationType.UPDATE,
-                                  change_review.getId());
-        return change_review;
+        Review changeReview = getReviewById(review.getId());
+        userEventDao.setUserEvent(changeReview.getUserId(), EventType.REVIEW, OperationType.UPDATE,
+                                  changeReview.getId());
+        return changeReview;
     }
 
     @Override
@@ -106,14 +94,15 @@ public class ReviewDaoImpl implements ReviewDao {
         if (checkReviewExist(reviewId)) {
             Review review = getReviewById(reviewId);
             jdbcTemplate.update(DELETE_REVIEW_BY_ID_SQL, reviewId);
-            log.info(stringToGreenColor("---The review was successfully DELETED: {}"), review);
             userEventDao.setUserEvent(review.getUserId(), EventType.REVIEW, OperationType.REMOVE, review.getId());
         }
     }
 
     @Override
-    public Collection<Review> receiveFilmsReviews(Integer count, String filmId) {
-        return jdbcTemplate.query(GET_RECEIVE_FILMS_REVIEW_BY_ID_SQL, (rs, rowNum) -> makeReview(rs), filmId).stream().limit(count).sorted(Comparator.comparingInt(Review::getUseful).reversed()).collect(Collectors.toList());
+    public List<Review> getReceiveFilmsReviews(Integer count, String filmId) {
+        return jdbcTemplate.query(GET_RECEIVE_FILMS_REVIEW_BY_ID_SQL, (rs, rowNum) -> makeReview(rs), filmId)
+                .stream().limit(count).sorted(Comparator.comparingInt(Review::getUseful).reversed())
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -155,8 +144,7 @@ public class ReviewDaoImpl implements ReviewDao {
     }
 
     private int getReviewUseful(int reviewId) {
-        SqlRowSet likesReviewRows =
-                jdbcTemplate.queryForRowSet(GET_REVIEW_USEFUL_SQL, reviewId);
+        SqlRowSet likesReviewRows = jdbcTemplate.queryForRowSet(GET_REVIEW_USEFUL_SQL, reviewId);
         if (likesReviewRows.next()) {
             return likesReviewRows.getInt("summary");
         }
@@ -166,8 +154,7 @@ public class ReviewDaoImpl implements ReviewDao {
     @Override
     public Review getReviewById(Integer reviewId) {
         if (checkReviewExist(reviewId)) {
-            Review review = jdbcTemplate.queryForObject(GET_REVIEW_BY_ID_SQL, (rs, rowNum) -> makeReview(rs),
-                                                        reviewId);
+            Review review = jdbcTemplate.queryForObject(GET_REVIEW_BY_ID_SQL, (rs, rowNum) -> makeReview(rs), reviewId);
             return review;
         } else {
             throw new RatingNotFoundException("Review with id=" + reviewId + " not found");
@@ -176,10 +163,6 @@ public class ReviewDaoImpl implements ReviewDao {
 
     private Boolean checkReviewExist(Integer reviewId) {
         Integer count = jdbcTemplate.queryForObject(CHECK_EXIST_REVIEW_SQL, Integer.class, reviewId);
-        if (count > 0) {
-            return true;
-        } else {
-            return false;
-        }
+        return count > 0;
     }
 }
