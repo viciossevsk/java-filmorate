@@ -15,20 +15,31 @@ import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
 
-import static ru.yandex.practicum.filmorate.otherFunction.AddvansedFunctions.stringToGreenColor;
-
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class FilmService {
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
+
+    private final static String DIRECTOR_AND_TITLE = "title,director";
+    private final static String TITLE_AND_DIRECTOR = "director,title";
+    private final static String DIRECTOR = "director";
+    private final static String TITLE = "title";
+
+    public void deleteFilmById(int filmId) {
+        filmStorage.deleteFilmById(filmId);
+    }
+
     public List<Film> getAllFilms() {
-        log.info(stringToGreenColor("call method getAllFilms in FilmStorage... via GET /films"));
         return filmStorage.getAllFilms();
     }
+
+    public List<Film> getFilmsDirectorsSortBy(Integer directorId, String sortBy) {
+        return filmStorage.getFilmsDirectorsSortBy(directorId, sortBy);
+    }
+
     public Film createFilm(Film film) {
-        log.info(stringToGreenColor("call method add film in FilmStorage... via POST /film"));
         if (film.getLikes() == null) {
             film.setLikes(new HashSet<>());
         }
@@ -37,13 +48,11 @@ public class FilmService {
     }
 
     public Film updateFilm(Film film) {
-        log.info(stringToGreenColor("call method update film in FilmStorage... via PUT /film"));
-        Film filmExist = filmStorage.getFilmById(film.getId());
         validateFilm(film);
         return filmStorage.updateFilm(film);
     }
+
     public void addLikeToFilm(Integer filmId, Integer userId) {
-        log.info(stringToGreenColor("add like film..."));
         Film filmExist = filmStorage.getFilmById(filmId);
         User userExist = userStorage.getUserById(userId);
         filmStorage.addLikeToFilm(filmId, userId);
@@ -54,7 +63,6 @@ public class FilmService {
     }
 
     public void removeLikeFromFilm(Integer filmId, Integer userId) {
-        log.info(stringToGreenColor("remove like from film..."));
         Film filmExist = filmStorage.getFilmById(filmId);
         User userExist = userStorage.getUserById(userId);
         filmStorage.removeLike(filmId, userId);
@@ -71,9 +79,8 @@ public class FilmService {
     /**
      * сортируем DESC
      */
-    public List<Film> getMostPopularFilms(Integer count) {
-        log.info(stringToGreenColor("getAllFilms... "));
-        return filmStorage.getMostPopularFilms(count);
+    public List<Film> getMostPopularFilms(Integer count, Integer genreId, Integer year) {
+        return filmStorage.getMostPopularFilms(count, genreId, year);
     }
 
     public List<Rating> getAllRatings() {
@@ -95,5 +102,23 @@ public class FilmService {
             throw new ValidationException("Duration must be positive number");
         }
         return true;
+    }
+
+    public List<Film> getCommonFilms(Integer userId, Integer friendId) {
+        return filmStorage.getCommonFilms(userId, friendId);
+    }
+
+    public List<Film> searchFilmsByQuery(String query, String by) {
+        switch (by) {
+            case DIRECTOR_AND_TITLE:
+            case TITLE_AND_DIRECTOR:
+                return filmStorage.searchFilmsByTitleDirector(query);
+            case DIRECTOR:
+                return filmStorage.searchFilmByDirector(query);
+            case TITLE:
+                return filmStorage.searchFilmByTitle(query);
+            default:
+                return filmStorage.getAllFilms();
+        }
     }
 }

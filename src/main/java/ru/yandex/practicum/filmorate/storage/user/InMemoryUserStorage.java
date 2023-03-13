@@ -6,11 +6,11 @@ import ru.yandex.practicum.filmorate.exception.UserException;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.model.UserEvent;
 
 import java.util.*;
 
 import static java.time.LocalDate.now;
-import static ru.yandex.practicum.filmorate.otherFunction.AddvansedFunctions.stringToGreenColor;
 
 @Slf4j
 @Component
@@ -19,13 +19,16 @@ public class InMemoryUserStorage implements UserStorage {
     private final Map<Integer, User> users = new HashMap<>();
     private int generatorId = 0;
 
+    @Override
+    public List<UserEvent> getFeedByUserId(Integer userId) {
+        return new ArrayList<>();
+    }
+
     public List<User> getAllUsers() {
-        log.info(stringToGreenColor("getAllUsers..."));
         return new ArrayList<>(users.values());
     }
 
     public User createUser(User user) {
-        log.info(stringToGreenColor("add user..."));
         validate(user);
         user.setId(++generatorId);
         users.put(user.getId(), user);
@@ -34,7 +37,6 @@ public class InMemoryUserStorage implements UserStorage {
 
 
     public User updateUser(User user) {
-        log.info(stringToGreenColor("update user..."));
         validate(user);
         if (user.getId() != null) {
             if (users.containsKey(user.getId())) {
@@ -71,7 +73,7 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public void deleteUser(Integer userId) {
+    public void deleteUserById(int userId) {
         users.remove(userId);
     }
 
